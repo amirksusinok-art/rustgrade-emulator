@@ -9,7 +9,9 @@ export type SoundId =
   | 'scrap_sell'
   | 'codelock_error'
   | 'airdrop_plane'
-  | 'airdrop_land';
+  | 'airdrop_land'
+  | 'furnace_turn_on'
+  | 'furnace_loop';
 
 interface SoundConfig {
   file: string;
@@ -28,6 +30,8 @@ const SOUND_CONFIGS: Record<SoundId, SoundConfig> = {
   codelock_error: { file: '/audio/codelock_error.mp3', volume: 0.65 },
   airdrop_plane: { file: '/audio/airdrop-plane.mp3', volume: 0.18 },
   airdrop_land: { file: '/audio/airdrop_land.mp3', volume: 0.22 },
+  furnace_turn_on: { file: '/audio/furnace_turn_on.wav', volume: 0.75 },
+  furnace_loop: { file: '/audio/furnace_loop.wav', volume: 0.6 },
 };
 
 class SoundManager {
@@ -141,6 +145,20 @@ class SoundManager {
       }
     } catch {
       // Safe fallback
+    }
+  }
+
+  public stop(id: SoundId): void {
+    if (this.audioPool.has(id)) {
+      const pool = this.audioPool.get(id)!;
+      pool.forEach((audio) => {
+        try {
+          audio.pause();
+          audio.currentTime = 0;
+        } catch {
+          // Ignore
+        }
+      });
     }
   }
 

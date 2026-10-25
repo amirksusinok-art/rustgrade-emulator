@@ -14,44 +14,12 @@ export interface StoredFairState {
 
 export function getDefaultProfile(): UserProfile {
   const randomSuffix = Math.floor(10000 + Math.random() * 90000);
-  const now = Date.now();
   return {
     id: `RG_${randomSuffix}`,
     nickname: 'RustSurfer',
     avatar: 'scientist',
-    balance: 25.00,
-    inventory: [
-      {
-        instanceId: `inst_${now}_starter_1`,
-        skinId: 'duelist_wood_door',
-        acquiredAt: now,
-      },
-      {
-        instanceId: `inst_${now}_starter_2`,
-        skinId: 'old_prisoner_pants',
-        acquiredAt: now + 1,
-      },
-      {
-        instanceId: `inst_${now}_starter_3`,
-        skinId: 'dragon_rage_kilt',
-        acquiredAt: now + 2,
-      },
-      {
-        instanceId: `inst_${now}_starter_4`,
-        skinId: 'camo_netting',
-        acquiredAt: now + 3,
-      },
-      {
-        instanceId: `inst_${now}_starter_5`,
-        skinId: 'plate_carrier___black',
-        acquiredAt: now + 4,
-      },
-      {
-        instanceId: `inst_${now}_starter_6`,
-        skinId: 'fire_jacket',
-        acquiredAt: now + 5,
-      },
-    ],
+    balance: 5.00,
+    inventory: [],
     stats: {
       totalUpgrades: 0,
       totalWins: 0,
@@ -75,11 +43,22 @@ export function loadUserProfile(): UserProfile {
       return def;
     }
     const parsed = JSON.parse(raw);
-    // If user's inventory was completely empty or minimal, seed realistic Rust skins
-    if (!parsed.inventory || parsed.inventory.length === 0) {
-      parsed.inventory = getDefaultProfile().inventory;
-      if (!parsed.balance || parsed.balance < 5) parsed.balance = 25.00;
+    if (!Array.isArray(parsed.inventory)) {
+      parsed.inventory = [];
+    }
+    // One-time cleanup of old hardcoded starter test skins
+    if (!localStorage.getItem('rustgrade_starter_cleaned_v2')) {
+      localStorage.setItem('rustgrade_starter_cleaned_v2', 'true');
+      parsed.inventory = parsed.inventory.filter(
+        (i: { instanceId?: string }) => !i.instanceId || !i.instanceId.includes('_starter_')
+      );
+      if (parsed.balance >= 20 && parsed.inventory.length === 0) {
+        parsed.balance = 5.00;
+      }
       saveUserProfile(parsed);
+    }
+    if (typeof parsed.balance !== 'number' || isNaN(parsed.balance)) {
+      parsed.balance = 5.00;
     }
     return parsed;
   } catch {

@@ -5,6 +5,7 @@ import { LeftSidebar } from './components/layout/LeftSidebar';
 import { UpgradeStage } from './components/upgrade/UpgradeStage';
 import { UserInventory } from './components/inventory/UserInventory';
 import { CatalogGrid } from './components/inventory/CatalogGrid';
+import { FurnaceTradeUp } from './components/furnace/FurnaceTradeUp';
 import { Footer } from './components/layout/Footer';
 
 // Modals
@@ -33,6 +34,8 @@ export function App() {
   const {
     profile,
     addScrap,
+    addSkin,
+    removeInventoryItems,
     sellInventoryItem,
     sellAllSkins,
     buySkin,
@@ -41,6 +44,8 @@ export function App() {
     redeemPromoCode,
     resetProgress,
   } = useUserStore();
+
+  const [activeNavTab, setActiveNavTab] = useState<'upgrade' | 'furnace'>('upgrade');
 
   const {
     selectedItemIds,
@@ -113,6 +118,15 @@ export function App() {
     }, 1000);
   }, [addScrap]);
 
+  // Trade-Up handler for Electric Furnace
+  const handleTradeUp = useCallback(
+    (removedInstanceIds: string[], gainedSkinId: string) => {
+      removeInventoryItems(removedInstanceIds);
+      addSkin(gainedSkinId);
+    },
+    [removeInventoryItems, addSkin]
+  );
+
   return (
     <div className="min-h-screen bg-bg-main text-text-primary flex flex-col justify-between relative selection:bg-primary-red selection:text-white">
       {/* Living Atmospheric Rust Background (sparks, hangar gradient, swinging lamp) */}
@@ -139,6 +153,8 @@ export function App() {
           <Header
             profile={profile}
             turboMode={turboMode}
+            activeTab={activeNavTab}
+            onSelectTab={setActiveNavTab}
             onToggleTurbo={() => setTurboMode(!turboMode)}
             onOpenFairModal={() => setIsFairModalOpen(true)}
             onOpenProfile={() => setIsProfileOpen(true)}
@@ -155,58 +171,72 @@ export function App() {
 
             {/* Main Content Area */}
             <main className="flex-1 max-w-[1550px] mx-auto px-3 sm:px-4 md:px-6 py-4 md:py-6 flex flex-col gap-6 w-full">
-              {/* 1. Core Upgrade Stage (Left Slot | Wheel & Button | Target Slot & Multipliers) */}
-              <section aria-label="Upgrade Arena">
-                <UpgradeStage
-                  selectedItems={selectedInventoryItems}
-                  scrapSlider={scrapSlider}
-                  userBalance={profile.balance}
-                  totalInputValue={totalInputValue}
-                  targetSkin={targetSkin}
-                  winProbability={winProbability}
-                  safetyStatus={safetyStatus}
-                  wheelRotation={wheelRotation}
-                  wheelOutcome={wheelOutcome}
-                  outcomeSkin={outcomeSkin}
-                  isSpinning={isSpinning}
-                  turboMode={turboMode}
-                  statusMessage={statusMessage}
-                  onRemoveItem={removeSelectedItem}
-                  onClearAll={clearSelectedItems}
-                  onSliderChange={setScrapSlider}
-                  onApplyMultiplier={applyMultiplier}
-                  onApplyChance={applyTargetChance}
-                  onExecuteUpgrade={executeUpgrade}
-                  onInspectTarget={() => targetSkin && setInspectSkin(targetSkin)}
-                />
-              </section>
-
-              {/* 2. Lower Split: User Inventory & Shop (Left) & Upgrade Catalog (Right) */}
-              <section
-                aria-label="Inventory and Catalog"
-                className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5 items-stretch"
-              >
-                {/* Left: User Inventory & Shop (Фото 5 & 2) */}
-                <UserInventory
+              {activeNavTab === 'furnace' ? (
+                /* Electric Furnace Trade-Up View */
+                <FurnaceTradeUp
                   inventory={profile.inventory}
                   userBalance={profile.balance}
-                  selectedItemIds={selectedItemIds}
-                  onToggleSelect={toggleSelectItem}
-                  onSellItem={sellInventoryItem}
-                  onSellAll={sellAllSkins}
+                  onTradeUp={handleTradeUp}
                   onBuySkin={buySkin}
                   onInspectSkin={handleInspectSkinId}
-                  disabled={isSpinning}
                 />
+              ) : (
+                /* Core Upgrade View */
+                <>
+                  {/* 1. Core Upgrade Stage (Left Slot | Wheel & Button | Target Slot & Multipliers) */}
+                  <section aria-label="Upgrade Arena">
+                    <UpgradeStage
+                      selectedItems={selectedInventoryItems}
+                      scrapSlider={scrapSlider}
+                      userBalance={profile.balance}
+                      totalInputValue={totalInputValue}
+                      targetSkin={targetSkin}
+                      winProbability={winProbability}
+                      safetyStatus={safetyStatus}
+                      wheelRotation={wheelRotation}
+                      wheelOutcome={wheelOutcome}
+                      outcomeSkin={outcomeSkin}
+                      isSpinning={isSpinning}
+                      turboMode={turboMode}
+                      statusMessage={statusMessage}
+                      onRemoveItem={removeSelectedItem}
+                      onClearAll={clearSelectedItems}
+                      onSliderChange={setScrapSlider}
+                      onApplyMultiplier={applyMultiplier}
+                      onApplyChance={applyTargetChance}
+                      onExecuteUpgrade={executeUpgrade}
+                      onInspectTarget={() => targetSkin && setInspectSkin(targetSkin)}
+                    />
+                  </section>
 
-                {/* Right: Catalog Grid (51 skins matching Photo 5) */}
-                <CatalogGrid
-                  selectedTargetSkin={targetSkin}
-                  onSelectTarget={setTargetSkin}
-                  onInspectSkin={handleInspectSkinId}
-                  disabled={isSpinning}
-                />
-              </section>
+                  {/* 2. Lower Split: User Inventory & Shop (Left) & Upgrade Catalog (Right) */}
+                  <section
+                    aria-label="Inventory and Catalog"
+                    className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5 items-stretch"
+                  >
+                    {/* Left: User Inventory & Shop (Фото 5 & 2) */}
+                    <UserInventory
+                      inventory={profile.inventory}
+                      userBalance={profile.balance}
+                      selectedItemIds={selectedItemIds}
+                      onToggleSelect={toggleSelectItem}
+                      onSellItem={sellInventoryItem}
+                      onSellAll={sellAllSkins}
+                      onBuySkin={buySkin}
+                      onInspectSkin={handleInspectSkinId}
+                      disabled={isSpinning}
+                    />
+
+                    {/* Right: Catalog Grid (51 skins matching Photo 5) */}
+                    <CatalogGrid
+                      selectedTargetSkin={targetSkin}
+                      onSelectTarget={setTargetSkin}
+                      onInspectSkin={handleInspectSkinId}
+                      disabled={isSpinning}
+                    />
+                  </section>
+                </>
+              )}
             </main>
           </div>
         </div>

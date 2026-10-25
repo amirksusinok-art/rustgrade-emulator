@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { UserProfile, AvatarId } from '../../types';
 import { soundManager } from '../../utils/soundManager';
-import { Volume2, VolumeX, ShieldCheck, Zap, User, ChevronUp, Bell, Plus } from 'lucide-react';
+import { Volume2, VolumeX, ShieldCheck, Zap, User, ChevronUp, Bell, Plus, Flame } from 'lucide-react';
 import { ScrapIcon } from '../common/ScrapIcon';
 
 interface HeaderProps {
   profile: UserProfile;
   turboMode: boolean;
+  activeTab?: 'upgrade' | 'furnace';
+  onSelectTab?: (tab: 'upgrade' | 'furnace') => void;
   onToggleTurbo: () => void;
   onOpenFairModal: () => void;
   onOpenProfile: () => void;
@@ -23,6 +25,8 @@ const AVATAR_ICONS: Record<AvatarId, string> = {
 export const Header: React.FC<HeaderProps> = ({
   profile,
   turboMode,
+  activeTab = 'upgrade',
+  onSelectTab,
   onToggleTurbo,
   onOpenFairModal,
   onOpenProfile,
@@ -44,7 +48,10 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="w-full flex items-center justify-between gap-3">
         {/* Left: Brand Logo & Navigation (Фото 5) */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 cursor-pointer group">
+          <div
+            onClick={() => onSelectTab && onSelectTab('upgrade')}
+            className="flex items-center gap-2 cursor-pointer group"
+          >
             <div className="w-7 h-7 rounded bg-[#E53935] flex items-center justify-center text-white shadow-[0_0_12px_rgba(229,57,53,0.6)]">
               <ChevronUp className="w-5 h-5 stroke-[3]" />
             </div>
@@ -53,13 +60,30 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </div>
 
-          {/* Navigation Tabs (Фото 5: Только UPGRADE) */}
-          <nav className="hidden md:flex items-center ml-2">
+          {/* Navigation Tabs: UPGRADE & ПЕРЕПЛАВКА */}
+          <nav className="flex items-center gap-1.5 ml-2">
             <button
-              className="flex items-center gap-1.5 px-4 py-1.5 rounded-t bg-[#2A1618] border-t-2 border-[#E53935] text-white text-xs font-black uppercase tracking-wider shadow-sm"
+              onClick={() => onSelectTab && onSelectTab('upgrade')}
+              className={`flex items-center gap-1.5 px-3 md:px-4 py-1.5 rounded-t text-xs font-black uppercase tracking-wider transition-all ${
+                activeTab === 'upgrade'
+                  ? 'bg-[#2A1618] border-t-2 border-[#E53935] text-white shadow-sm'
+                  : 'bg-transparent text-text-muted hover:text-white'
+              }`}
             >
               <ChevronUp className="w-3.5 h-3.5 text-[#E53935]" />
               <span>UPGRADE</span>
+            </button>
+
+            <button
+              onClick={() => onSelectTab && onSelectTab('furnace')}
+              className={`flex items-center gap-1.5 px-3 md:px-4 py-1.5 rounded-t text-xs font-black uppercase tracking-wider transition-all ${
+                activeTab === 'furnace'
+                  ? 'bg-[#2E180E] border-t-2 border-[#FF9800] text-white shadow-sm'
+                  : 'bg-transparent text-text-muted hover:text-white'
+              }`}
+            >
+              <Flame className={`w-3.5 h-3.5 ${activeTab === 'furnace' ? 'text-[#FF9800] fill-current' : 'text-amber-500'}`} />
+              <span>ПЕРЕПЛАВКА</span>
             </button>
           </nav>
         </div>
