@@ -37,11 +37,14 @@ export const TargetSlot: React.FC<TargetSlotProps> = ({ targetSkin, onInspect })
       <div className="my-auto py-3 min-h-[220px] flex items-center justify-center">
         {targetSkin ? (
           <div className="flex flex-col items-center justify-center w-full">
-            <div className="relative h-36 w-full flex items-center justify-center">
+            <div className="relative h-36 w-full flex items-center justify-center overflow-hidden">
               <img
                 src={`/images/skins/${targetSkin.localFile}`}
                 alt={targetSkin.name}
-                className="max-h-32 object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = targetSkin.iconUrl;
+                }}
+                className="max-h-32 max-w-full object-contain scale-125 drop-shadow-[0_10px_20px_rgba(0,0,0,0.85)] transition-transform duration-300"
               />
             </div>
 

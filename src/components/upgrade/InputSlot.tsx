@@ -90,11 +90,16 @@ export const InputSlot: React.FC<InputSlotProps> = ({
                     <X className="w-2.5 h-2.5" />
                   </button>
 
-                  <img
-                    src={`/images/skins/${skin.localFile}`}
-                    alt={skin.name}
-                    className="max-h-12 object-contain drop-shadow my-1"
-                  />
+                  <div className="h-14 w-full flex items-center justify-center overflow-hidden my-0.5">
+                    <img
+                      src={`/images/skins/${skin.localFile}`}
+                      alt={skin.name}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = skin.iconUrl;
+                      }}
+                      className="max-h-full max-w-full object-contain scale-115 drop-shadow"
+                    />
+                  </div>
 
                   <span className="text-[9px] font-bold text-white truncate w-full text-center">
                     {skin.name}

@@ -128,7 +128,7 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({
       </div>
 
       {/* Grid of Catalog skins */}
-      <div className="my-2 min-h-[380px] max-h-[500px] overflow-y-auto pr-1">
+      <div className="my-2 min-h-[420px] max-h-[560px] overflow-y-auto pr-1">
         {paginatedSkins.length === 0 ? (
           <div className="h-full min-h-[320px] flex flex-col items-center justify-center text-center p-6 text-text-muted">
             <span className="text-xs font-bold uppercase text-white">

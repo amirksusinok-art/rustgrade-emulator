@@ -19,40 +19,54 @@ interface ItemCardProps {
 const RARITY_THEMES: Record<
   ItemRarity,
   {
-    bg: string;
-    borderTop: string;
+    gradient: string;
+    border: string;
+    borderHover: string;
     textColor: string;
+    auraColor: string;
   }
 > = {
   contraband: {
-    bg: 'bg-gradient-to-b from-[#5c4a16] via-[#3d310e] to-[#1c1606]',
-    borderTop: 'border-t-[#FFB800]',
+    gradient: 'from-[#3a2c0d] via-[#1c1506] to-[#0e0a03]',
+    border: 'border-[#FFB800]',
+    borderHover: 'group-hover:border-[#FFD54F] group-hover:shadow-[0_0_18px_rgba(255,184,0,0.4)]',
     textColor: 'text-[#FFD54F]',
+    auraColor: 'radial-gradient(circle, rgba(255,184,0,0.28) 0%, transparent 70%)',
   },
   master: {
-    bg: 'bg-gradient-to-b from-[#4a1818] via-[#320f0f] to-[#170606]',
-    borderTop: 'border-t-[#E53935]',
+    gradient: 'from-[#3a1415] via-[#1e0a0b] to-[#0f0505]',
+    border: 'border-[#E53935]',
+    borderHover: 'group-hover:border-[#EF5350] group-hover:shadow-[0_0_18px_rgba(229,57,53,0.4)]',
     textColor: 'text-[#EF5350]',
+    auraColor: 'radial-gradient(circle, rgba(229,57,53,0.28) 0%, transparent 70%)',
   },
   classified: {
-    bg: 'bg-gradient-to-b from-[#3d184a] via-[#280e30] to-[#120617]',
-    borderTop: 'border-t-[#8E24AA]',
+    gradient: 'from-[#34143f] via-[#1c0a22] to-[#0e0511]',
+    border: 'border-[#8E24AA]',
+    borderHover: 'group-hover:border-[#BA68C8] group-hover:shadow-[0_0_18px_rgba(142,36,170,0.4)]',
     textColor: 'text-[#CE93D8]',
+    auraColor: 'radial-gradient(circle, rgba(142,36,170,0.28) 0%, transparent 70%)',
   },
   restricted: {
-    bg: 'bg-gradient-to-b from-[#162e45] via-[#0d1d2b] to-[#060c13]',
-    borderTop: 'border-t-[#1E88E5]',
+    gradient: 'from-[#12283d] via-[#091520] to-[#040a10]',
+    border: 'border-[#1E88E5]',
+    borderHover: 'group-hover:border-[#64B5F6] group-hover:shadow-[0_0_18px_rgba(30,136,229,0.4)]',
     textColor: 'text-[#64B5F6]',
+    auraColor: 'radial-gradient(circle, rgba(30,136,229,0.28) 0%, transparent 70%)',
   },
   'mil-spec': {
-    bg: 'bg-gradient-to-b from-[#1b3d1b] via-[#102410] to-[#061006]',
-    borderTop: 'border-t-[#43A047]',
+    gradient: 'from-[#143317] via-[#0a1a0c] to-[#050e06]',
+    border: 'border-[#43A047]',
+    borderHover: 'group-hover:border-[#81C784] group-hover:shadow-[0_0_18px_rgba(67,160,71,0.4)]',
     textColor: 'text-[#81C784]',
+    auraColor: 'radial-gradient(circle, rgba(67,160,71,0.28) 0%, transparent 70%)',
   },
   industrial: {
-    bg: 'bg-gradient-to-b from-[#2b2e34] via-[#1c1e22] to-[#0e0f11]',
-    borderTop: 'border-t-[#78909C]',
+    gradient: 'from-[#22262e] via-[#13151a] to-[#0a0b0d]',
+    border: 'border-[#546E7A]',
+    borderHover: 'group-hover:border-[#90A4AE] group-hover:shadow-[0_0_14px_rgba(84,110,122,0.3)]',
     textColor: 'text-[#B0BEC5]',
+    auraColor: 'radial-gradient(circle, rgba(84,110,122,0.18) 0%, transparent 70%)',
   },
 };
 
@@ -74,16 +88,17 @@ export const ItemCard: React.FC<ItemCardProps> = ({
     <div
       onClick={isShopItem ? onBuy : onSelect}
       className={`
-        relative group rounded-md border border-[#232731] border-t-2 ${theme.borderTop}
-        ${theme.bg} ${isSelected ? 'ring-2 ring-primary-red ring-offset-1 ring-offset-[#0D0F12]' : ''}
-        transition-all duration-150 cursor-pointer overflow-hidden flex flex-col justify-between
-        hover:brightness-110 active:scale-[0.98]
-        ${compact ? 'p-2 min-h-[135px]' : 'p-2.5 min-h-[160px]'}
+        relative group rounded-lg border-2 ${theme.border} ${theme.borderHover}
+        bg-gradient-to-b ${theme.gradient}
+        ${isSelected ? 'ring-2 ring-primary-red ring-offset-2 ring-offset-[#0D0F12] scale-[1.02]' : ''}
+        transition-all duration-200 cursor-pointer overflow-hidden flex flex-col justify-between
+        hover:brightness-110 active:scale-[0.98] select-none
+        ${compact ? 'p-2 min-h-[160px]' : 'p-3 min-h-[185px]'}
       `}
     >
-      {/* Top action icons */}
+      {/* Top action bar: Item category label and quick action buttons */}
       <div className="flex items-center justify-between w-full z-10">
-        <span className="text-[9px] uppercase tracking-wider font-bold text-white/50 truncate max-w-[75%]">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-white/60 truncate max-w-[75%]">
           {skin.type}
         </span>
 
@@ -94,7 +109,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
                 e.stopPropagation();
                 onInspect();
               }}
-              className="p-1 rounded bg-black/60 hover:bg-black text-white/70 hover:text-white transition-colors"
+              className="p-1 rounded bg-black/70 hover:bg-black text-white/80 hover:text-white transition-colors"
               title="3D Осмотр"
             >
               <Eye className="w-3 h-3" />
@@ -107,7 +122,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
                 e.stopPropagation();
                 onRemove();
               }}
-              className="p-1 rounded bg-red-600/80 hover:bg-red-600 text-white transition-colors"
+              className="p-1 rounded bg-red-600/90 hover:bg-red-600 text-white transition-colors"
               title="Убрать"
             >
               <Trash2 className="w-3 h-3" />
@@ -118,66 +133,68 @@ export const ItemCard: React.FC<ItemCardProps> = ({
 
       {/* Selected Indicator Checkmark */}
       {isSelected && (
-        <div className="absolute top-1.5 right-1.5 bg-primary-red text-white p-0.5 rounded z-20 shadow">
-          <Check className="w-3 h-3 stroke-[3]" />
+        <div className="absolute top-2 right-2 bg-primary-red text-white p-0.5 rounded z-20 shadow-lg">
+          <Check className="w-3.5 h-3.5 stroke-[3]" />
         </div>
       )}
 
-      {/* Item Image */}
-      <div className="relative w-full flex items-center justify-center my-1.5 py-1">
+      {/* Item Image with atmospheric rarity glow & large scale */}
+      <div className="relative w-full flex items-center justify-center my-1 h-24 sm:h-28 overflow-hidden">
+        {/* Soft Radial Aura behind the skin */}
+        <div
+          className="absolute inset-0 rounded-full blur-md pointer-events-none opacity-45 group-hover:opacity-85 transition-opacity"
+          style={{ background: theme.auraColor }}
+        />
+
         <img
           src={`/images/skins/${skin.localFile}`}
           alt={skin.name}
           onError={(e) => {
             (e.target as HTMLImageElement).src = skin.iconUrl;
           }}
-          className={`
-            object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.8)]
-            group-hover:scale-105 transition-transform duration-200 ease-out
-            ${compact ? 'max-h-16 w-auto' : 'max-h-20 w-auto'}
-          `}
+          className="max-h-full max-w-full object-contain scale-125 group-hover:scale-135 transition-transform duration-300 ease-out drop-shadow-[0_8px_16px_rgba(0,0,0,0.9)] filter"
           loading="lazy"
         />
       </div>
 
-      {/* Bottom info: Name & Price strictly styled like Photo 2 */}
+      {/* Bottom info: Name & Price strictly styled like original Rustgrade */}
       <div className="w-full z-10 flex flex-col items-center text-center mt-1">
         <span
-          className={`text-[11px] font-extrabold uppercase tracking-wide truncate w-full block ${theme.textColor}`}
+          className={`font-rajdhani font-black text-xs sm:text-sm uppercase tracking-wide truncate w-full block ${theme.textColor}`}
           title={skin.name}
         >
           {skin.name}
         </span>
 
-        <div className="flex items-center justify-center gap-1 mt-0.5 font-rajdhani font-black text-xs text-[#FFD54F]">
+        <div className="flex items-center justify-center gap-1 mt-0.5 font-rajdhani font-black text-xs sm:text-sm text-[#FFD54F]">
           <ScrapIcon size="xs" />
           <span>{skin.price.toFixed(2)}</span>
         </div>
 
         {/* Hover Action Badge: BUY in shop, SELL in inventory */}
         {isShopItem && onBuy && (
-          <div className="mt-1 w-full opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="mt-1.5 w-full opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onBuy();
               }}
-              className="w-full py-0.5 rounded bg-success-green hover:bg-success-green-hover text-white text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 shadow"
+              className="w-full py-1 rounded bg-[#4CAF50] hover:bg-[#43A047] text-white text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-1 shadow-md transition-all active:scale-95"
             >
-              <ShoppingCart className="w-2.5 h-2.5" />
+              <ShoppingCart className="w-3 h-3 stroke-[2.5]" />
               <span>Купить</span>
             </button>
           </div>
         )}
 
         {!isShopItem && showSellButton && onSell && (
-          <div className="mt-1 w-full opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="mt-1.5 w-full opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onSell();
               }}
-              className="w-full py-0.5 rounded bg-zinc-700 hover:bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider transition-colors"
+              className="w-full py-1 rounded bg-zinc-800 hover:bg-red-700 text-white text-[10px] font-black uppercase tracking-wider transition-colors shadow-md active:scale-95"
             >
               Продать
             </button>

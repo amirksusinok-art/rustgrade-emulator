@@ -235,7 +235,7 @@ export const UserInventory: React.FC<UserInventoryProps> = ({
       </div>
 
       {/* Grid of Items strictly matching Photo 5 & Photo 2 */}
-      <div className="my-2 min-h-[360px] max-h-[460px] overflow-y-auto pr-1">
+      <div className="my-2 min-h-[420px] max-h-[560px] overflow-y-auto pr-1">
         {activeTab === 'inventory' ? (
           displayInventory.length === 0 ? (
             <div className="h-full min-h-[300px] flex flex-col items-center justify-center text-center p-6 text-text-muted">
