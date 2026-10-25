@@ -85,6 +85,7 @@ export interface CaseDefinition {
   badge: string;
   color: string;
   glowColor: string;
+  image: string;
   isFree?: boolean;
   freeConditionText?: string;
   items: CaseItem[];

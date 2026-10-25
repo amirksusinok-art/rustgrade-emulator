@@ -92,30 +92,38 @@ export const LivingBackground: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-      {/* Background industrial gradient */}
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
+      {/* 1. Warehouse Background Photo (Photo 5 from user) */}
       <div 
-        className="absolute inset-0 bg-[#0D0F12]"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-700"
         style={{
-          backgroundImage: `
-            radial-gradient(circle at 50% 25%, rgba(229, 57, 53, 0.06) 0%, transparent 55%),
-            radial-gradient(circle at 50% 65%, rgba(255, 152, 0, 0.04) 0%, transparent 60%),
-            linear-gradient(180deg, #090B0E 0%, #0D0F12 50%, #090B0E 100%)
+          backgroundImage: `url('/images/background/warehouse_bg.png')`,
+          filter: 'brightness(0.38) contrast(1.15) saturate(0.85)',
+        }}
+      />
+
+      {/* 2. Atmospheric Dark Rust Vignette & Deep Lighting */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: `
+            radial-gradient(circle at 50% 35%, rgba(13, 16, 22, 0.45) 0%, rgba(10, 12, 16, 0.85) 65%, rgba(6, 8, 10, 0.98) 100%),
+            linear-gradient(180deg, rgba(14, 17, 24, 0.55) 0%, rgba(10, 12, 16, 0.75) 50%, rgba(6, 8, 11, 0.96) 100%)
           `,
         }}
       />
 
-      {/* Industrial metal grid texture overlay */}
+      {/* 3. Subtle Industrial Grid */}
       <div 
-        className="absolute inset-0 opacity-[0.035]" 
+        className="absolute inset-0 opacity-[0.03]" 
         style={{
           backgroundImage: `radial-gradient(#ffffff 1px, transparent 1px)`,
           backgroundSize: '24px 24px',
         }}
       />
 
-      {/* Swinging Workbench T3 Hanging Light */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-64 flex flex-col items-center pointer-events-none origin-top animate-lamp-swing opacity-60">
+      {/* 4. Workbench T3 Hanging Light */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-64 flex flex-col items-center pointer-events-none origin-top animate-lamp-swing opacity-50">
         {/* Wire */}
         <div className="w-[2px] h-36 bg-gradient-to-b from-[#1b202a] via-[#363c4e] to-[#262b37]" />
         {/* Lamp Hood */}
@@ -131,7 +139,7 @@ export const LivingBackground: React.FC = () => {
         />
       </div>
 
-      {/* Canvas with fire sparks */}
+      {/* 5. Canvas with fire sparks */}
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
     </div>
   );

@@ -234,10 +234,10 @@ export const CaseRouletteModal: React.FC<CaseRouletteModalProps> = ({
         <div className="flex items-center justify-between px-4 py-3 bg-[#151821] border-b border-[#232731]">
           <div className="flex items-center gap-2.5">
             <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold"
-              style={{ backgroundColor: `${caseDef.color}30`, border: `1px solid ${caseDef.color}` }}
+              className="w-10 h-10 rounded-lg flex items-center justify-center p-0.5 overflow-hidden shadow-inner"
+              style={{ backgroundColor: `${caseDef.color}20`, border: `1px solid ${caseDef.color}60` }}
             >
-              <Package className="w-4 h-4" style={{ color: caseDef.color }} />
+              <img src={caseDef.image} alt={caseDef.name} className="w-full h-full object-contain drop-shadow" />
             </div>
             <div>
               <div className="flex items-center gap-2">
