@@ -87,3 +87,22 @@ input[type=range]::-webkit-slider-thumb:hover {
 .animate-shake {
   animation: shakeAnim 0.5s cubic-bezier(.36,.07,.19,.97) both;
 }
+
+@keyframes needleTwitch {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-1.5px) rotate(-1.5deg); }
+  75% { transform: translateY(1px) rotate(1.5deg); }
+}
+
+.animate-needle-twitch {
+  animation: needleTwitch 0.08s infinite ease-in-out;
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 12s linear infinite;
+}

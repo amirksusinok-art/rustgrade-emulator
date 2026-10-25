@@ -1,6 +1,7 @@
 import React from 'react';
 import { SkinDefinition, ItemRarity } from '../../types';
 import { Eye, Trash2, Check, ShoppingCart } from 'lucide-react';
+import { ScrapIcon } from '../common/ScrapIcon';
 
 interface ItemCardProps {
   skin: SkinDefinition;
@@ -149,7 +150,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
         </span>
 
         <div className="flex items-center justify-center gap-1 mt-0.5 font-rajdhani font-black text-xs text-[#FFD54F]">
-          <span className="text-[10px]">⚙️</span>
+          <ScrapIcon size="xs" />
           <span>{skin.price.toFixed(2)}</span>
         </div>
 

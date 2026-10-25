@@ -1,6 +1,7 @@
 import React from 'react';
 import { SkinDefinition } from '../../types';
 import { Eye } from 'lucide-react';
+import { ScrapIcon } from '../common/ScrapIcon';
 
 interface TargetSlotProps {
   targetSkin: SkinDefinition | null;
@@ -78,8 +79,8 @@ export const TargetSlot: React.FC<TargetSlotProps> = ({ targetSkin, onInspect })
           СТОИМОСТЬ ПРЕДМЕТА:
         </span>
 
-        <span className="font-rajdhani font-black text-base text-[#FFD54F] flex items-center gap-1">
-          <span>⚙</span>
+        <span className="font-rajdhani font-black text-base text-[#FFD54F] flex items-center gap-1.5">
+          <ScrapIcon size="sm" />
           <span>{targetSkin ? targetSkin.price.toFixed(2) : '0.00'}</span>
         </span>
       </div>

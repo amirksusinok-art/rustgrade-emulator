@@ -21,6 +21,7 @@ import { SKINS_MAP } from './data/skinsData';
 import { SkinDefinition, AvatarId } from './types';
 import { soundManager } from './utils/soundManager';
 import { Headphones } from 'lucide-react';
+import { ScrapIcon } from './components/common/ScrapIcon';
 
 interface ClickParticle {
   id: number;
@@ -122,10 +123,11 @@ export function App() {
         {particles.map((p) => (
           <div
             key={p.id}
-            className="absolute font-rajdhani font-black text-lg text-[#FFD54F] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] animate-float-up"
+            className="absolute font-rajdhani font-black text-lg text-[#FFD54F] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] animate-float-up flex items-center gap-1"
             style={{ left: p.x - 25, top: p.y - 20 }}
           >
-            +1.00 ⚙️
+            <span>+1.00</span>
+            <ScrapIcon size="sm" />
           </div>
         ))}
       </div>

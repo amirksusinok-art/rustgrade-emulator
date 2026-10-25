@@ -22,7 +22,7 @@ interface UpgradeStageProps {
   isSpinning: boolean;
   turboMode: boolean;
   statusMessage: string | null;
-  wheelOutcome?: 'idle' | 'win' | 'lose';
+  wheelOutcome?: 'idle' | 'win' | 'lose' | 'golden_win';
   outcomeSkin?: SkinDefinition | null;
   onRemoveItem: (instanceId: string) => void;
   onClearAll: () => void;

@@ -2,6 +2,7 @@ import React from 'react';
 import { InventoryItem } from '../../types';
 import { SKINS_MAP } from '../../data/skinsData';
 import { X, Trash2 } from 'lucide-react';
+import { ScrapIcon } from '../common/ScrapIcon';
 
 interface InputSlotProps {
   selectedItems: InventoryItem[];
@@ -98,8 +99,9 @@ export const InputSlot: React.FC<InputSlotProps> = ({
                   <span className="text-[9px] font-bold text-white truncate w-full text-center">
                     {skin.name}
                   </span>
-                  <span className="text-[10px] font-rajdhani font-bold text-[#FFD54F]">
-                    ⚙ {skin.price.toFixed(2)}
+                  <span className="text-[10px] font-rajdhani font-bold text-[#FFD54F] flex items-center justify-center gap-0.5">
+                    <ScrapIcon size="xs" />
+                    <span>{skin.price.toFixed(2)}</span>
                   </span>
                 </div>
               );
@@ -118,7 +120,7 @@ export const InputSlot: React.FC<InputSlotProps> = ({
           </span>
 
           <span className="font-rajdhani font-bold text-xs text-white flex items-center gap-1">
-            <span className="text-zinc-400">⚙</span>
+            <ScrapIcon size="xs" />
             <span className="text-white text-sm">{scrapSlider.toFixed(2)}</span>
             <span className="text-[10px] text-text-muted">
               (МАКС {userBalance.toFixed(2)})

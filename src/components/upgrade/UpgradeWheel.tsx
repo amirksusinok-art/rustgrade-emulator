@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Edit2, Check, X, CheckCircle, XCircle } from 'lucide-react';
+import { Edit2, Check, X, CheckCircle, XCircle, Crown, Sparkles } from 'lucide-react';
 import { SkinDefinition } from '../../types';
+import { ScrapIcon } from '../common/ScrapIcon';
 
 interface UpgradeWheelProps {
   winProbability: number;
@@ -12,7 +13,7 @@ interface UpgradeWheelProps {
     color: string;
     bg: string;
   };
-  wheelOutcome?: 'idle' | 'win' | 'lose';
+  wheelOutcome?: 'idle' | 'win' | 'lose' | 'golden_win';
   outcomeSkin?: SkinDefinition | null;
   onSetCustomChance?: (chance: number) => void;
 }
@@ -38,6 +39,9 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
   // Win Sector arc angle in degrees (1° to 359.99°)
   const angle = Math.min(359.99, Math.max(1, (winProbability / 100) * 360));
 
+  // Golden Zone Sector arc angle (2.0% of wheel = 7.2°)
+  const goldenAngle = 7.2;
+
   // Determine sector color
   const sectorColor =
     winProbability >= 75
@@ -62,23 +66,26 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
     };
   };
 
-  const startAngle = 0;
-  const endAngle = angle;
-  const largeArcFlag = angle > 180 ? 1 : 0;
+  // SVG path builder for an arc sector between startAngle and endAngle
+  const createSectorPath = (startDeg: number, endDeg: number) => {
+    const arcSpan = endDeg - startDeg;
+    const largeArc = arcSpan > 180 ? 1 : 0;
+    const startOuter = polarToCartesian(center, center, outerRadius, startDeg);
+    const endOuter = polarToCartesian(center, center, outerRadius, endDeg);
+    const startInner = polarToCartesian(center, center, innerRadius, startDeg);
+    const endInner = polarToCartesian(center, center, innerRadius, endDeg);
 
-  const startOuter = polarToCartesian(center, center, outerRadius, startAngle);
-  const endOuter = polarToCartesian(center, center, outerRadius, endAngle);
-  const startInner = polarToCartesian(center, center, innerRadius, startAngle);
-  const endInner = polarToCartesian(center, center, innerRadius, endAngle);
+    return `
+      M ${startOuter.x} ${startOuter.y}
+      A ${outerRadius} ${outerRadius} 0 ${largeArc} 1 ${endOuter.x} ${endOuter.y}
+      L ${endInner.x} ${endInner.y}
+      A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${startInner.x} ${startInner.y}
+      Z
+    `;
+  };
 
-  // SVG path for static victory sector arc
-  const sectorPath = `
-    M ${startOuter.x} ${startOuter.y}
-    A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${endOuter.x} ${endOuter.y}
-    L ${endInner.x} ${endInner.y}
-    A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${startInner.x} ${startInner.y}
-    Z
-  `;
+  const winSectorPath = createSectorPath(goldenAngle, angle);
+  const goldenSectorPath = createSectorPath(0, goldenAngle);
 
   // Rivets on the outer steel ring (24 rivets)
   const rivets = Array.from({ length: 24 }).map((_, i) => {
@@ -98,23 +105,32 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
 
   return (
     <div className="relative flex items-center justify-center select-none my-2">
+      {/* Golden Ray Sunburst Background on X4 Golden Win */}
+      {wheelOutcome === 'golden_win' && (
+        <div className="absolute w-[440px] h-[440px] rounded-full pointer-events-none z-0 animate-spin-slow opacity-80">
+          <div className="w-full h-full bg-[radial-gradient(circle,_rgba(255,215,0,0.4)_0%,_rgba(255,140,0,0.15)_60%,_transparent_75%)]" />
+        </div>
+      )}
+
       {/* Outer Glow Halo */}
       <div
         className="absolute w-72 h-72 rounded-full pointer-events-none transition-all duration-500"
         style={{
           boxShadow:
-            wheelOutcome === 'win'
+            wheelOutcome === 'golden_win'
+              ? '0 0 80px rgba(255, 215, 0, 0.9), 0 0 30px rgba(255, 140, 0, 0.8)'
+              : wheelOutcome === 'win'
               ? '0 0 60px rgba(76, 175, 80, 0.7)'
               : wheelOutcome === 'lose'
               ? '0 0 60px rgba(229, 57, 53, 0.7)'
               : `0 0 45px ${sectorGlow}`,
-          opacity: isSpinning ? 0.9 : 0.4,
+          opacity: isSpinning ? 0.9 : 0.45,
         }}
       />
 
       {/* SVG Wheel Stage (320x320) */}
       <div className={`relative w-[320px] h-[320px] ${wheelOutcome === 'lose' ? 'animate-shake' : ''}`}>
-        {/* 1. COMPLETELY STATIC WHEEL PLATE (Фото 5: колесо стоит на месте, не крутится) */}
+        {/* 1. COMPLETELY STATIC WHEEL PLATE (Диск стоит неподвижно) */}
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible">
           <defs>
             <linearGradient id="wheelMetal" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -126,6 +142,14 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
             <linearGradient id="sectorFill" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor={sectorColor} stopOpacity="0.95" />
               <stop offset="100%" stopColor={sectorColor} stopOpacity="0.80" />
+            </linearGradient>
+
+            {/* Radiant Metallic Gold Gradient for Golden Zone */}
+            <linearGradient id="goldenSectorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FFF9C4" />
+              <stop offset="40%" stopColor="#FFD54F" />
+              <stop offset="80%" stopColor="#FFA000" />
+              <stop offset="100%" stopColor="#FF6F00" />
             </linearGradient>
           </defs>
 
@@ -149,24 +173,35 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
             strokeWidth={outerRadius - innerRadius}
           />
 
-          {/* Win Sector Arc (Static in place) */}
+          {/* Regular Win Sector Arc (if angle > goldenAngle) */}
+          {angle > goldenAngle && (
+            <path
+              d={winSectorPath}
+              fill="url(#sectorFill)"
+              stroke={sectorColor}
+              strokeWidth="1.5"
+              filter="drop-shadow(0px 0px 6px rgba(0,0,0,0.6))"
+            />
+          )}
+
+          {/* 🌟 GOLDEN ZONE (ЗОЛОТАЯ ЗОНА X4) Arc on Wheel */}
           <path
-            d={sectorPath}
-            fill="url(#sectorFill)"
-            stroke={sectorColor}
-            strokeWidth="1.5"
-            filter="drop-shadow(0px 0px 6px rgba(0,0,0,0.6))"
+            d={goldenSectorPath}
+            fill="url(#goldenSectorGrad)"
+            stroke="#FFE082"
+            strokeWidth="2"
+            filter="drop-shadow(0px 0px 8px rgba(255,215,0,0.8))"
           />
 
-          {/* Sector start divider line at 12:00 */}
+          {/* Golden Zone Divider Lines */}
           <line
             x1={center}
             y1={center - innerRadius}
             x2={center}
             y2={center - outerRadius}
-            stroke="#ffffff"
-            strokeWidth="2"
-            opacity="0.8"
+            stroke="#FFF59D"
+            strokeWidth="2.5"
+            opacity="0.95"
           />
 
           {/* Outer Steel Rim with Rivets */}
@@ -209,18 +244,31 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
           ))}
         </svg>
 
-        {/* 2. ROTATING POINTER / ARROW LAYER (Крутится только стрелка вокруг колеса) */}
+        {/* Golden Zone 'X4' Badge placed near 12:02 position */}
+        <div className="absolute top-1 left-[54%] -translate-x-1/2 pointer-events-none z-10">
+          <span className="px-1 py-0.2 rounded bg-amber-500 text-[8px] font-black font-rajdhani text-black shadow-[0_0_8px_#FFD54F] border border-yellow-200">
+            X4
+          </span>
+        </div>
+
+        {/* 2. ROTATING POINTER / ARROW LAYER WITH ENHANCED REALISTIC PHYSICS ANIMATION */}
         <div
           className="absolute inset-0 pointer-events-none z-20"
           style={{
             transform: `rotate(${rotation}deg)`,
             transition: isSpinning
-              ? `transform ${turboMode ? 0.8 : 3.5}s cubic-bezier(0.12, 0.8, 0.33, 1)`
+              ? `transform ${turboMode ? 0.8 : 3.6}s cubic-bezier(0.15, 0.85, 0.25, 1)`
               : 'none',
           }}
         >
           {/* Arrow Pointer positioned at the outer top perimeter, pointing toward the center */}
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex flex-col items-center filter drop-shadow-[0_4px_12px_rgba(229,57,53,0.8)]">
+          <div
+            className={`
+              absolute -top-3 left-1/2 -translate-x-1/2 flex flex-col items-center
+              filter drop-shadow-[0_4px_12px_rgba(229,57,53,0.85)]
+              ${isSpinning ? 'animate-needle-twitch' : ''}
+            `}
+          >
             <svg width="26" height="30" viewBox="0 0 26 30">
               {/* Rustgrade Arrow Triangle */}
               <polygon
@@ -243,16 +291,15 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
           </div>
         </div>
 
-        {/* 3. CENTER HUB WITH IN-WHEEL WIN / LOSS OUTCOME PRESENTATION */}
-        {/* If Won: Shows the item on the wheel with glowing aura and confetti */}
-        {/* If Lost: Shows defeat pulse on the wheel */}
-        {/* If Idle: Shows standard percentage and safety status matching Photo 5 */}
+        {/* 3. CENTER HUB WITH IN-WHEEL WIN / GOLDEN WIN / LOSS OUTCOME PRESENTATION */}
         <div
           className={`
             absolute inset-0 m-auto w-[184px] h-[184px] rounded-full
             flex flex-col items-center justify-center z-10 transition-all duration-300
             ${
-              wheelOutcome === 'win'
+              wheelOutcome === 'golden_win'
+                ? 'bg-gradient-to-b from-[#2A210A] via-[#1A1405] to-[#0A0802] border-4 border-[#FFD54F] shadow-[0_0_40px_rgba(255,215,0,0.8)]'
+                : wheelOutcome === 'win'
                 ? 'bg-gradient-to-b from-[#1C2C1D] via-[#121E14] to-[#0A120B] border-4 border-[#4CAF50] shadow-[0_0_30px_rgba(76,175,80,0.6)]'
                 : wheelOutcome === 'lose'
                 ? 'bg-gradient-to-b from-[#2E1214] via-[#1F0B0C] to-[#0D0506] border-4 border-[#E53935] shadow-[0_0_30px_rgba(229,57,53,0.6)]'
@@ -260,8 +307,34 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
             }
           `}
         >
-          {wheelOutcome === 'win' && outcomeSkin ? (
-            /* IN-WHEEL WIN DISPLAY */
+          {/* A. GOLDEN ZONE X4 JACKPOT WIN CELEBRATION */}
+          {wheelOutcome === 'golden_win' && outcomeSkin ? (
+            <div className="flex flex-col items-center text-center px-2 animate-fade-in relative z-20">
+              <div className="flex items-center gap-1 text-[#FFD54F] font-black text-[11px] uppercase tracking-wider mb-0.5 animate-pulse">
+                <Crown className="w-3.5 h-3.5 fill-current" />
+                <span>ЗОЛОТАЯ ЗОНА X4!</span>
+              </div>
+              <div className="relative">
+                <img
+                  src={`/images/skins/${outcomeSkin.localFile}`}
+                  alt={outcomeSkin.name}
+                  className="max-h-16 object-contain my-0.5 filter drop-shadow-[0_0_16px_rgba(255,215,0,0.9)] animate-bounce"
+                />
+                <span className="absolute -top-1 -right-2 px-1 rounded bg-[#FFD54F] text-black font-rajdhani font-black text-[10px] shadow">
+                  4x
+                </span>
+              </div>
+              <span className="text-[10px] font-bold text-white uppercase truncate max-w-[150px]">
+                {outcomeSkin.name}
+              </span>
+              <div className="flex items-center gap-1 font-rajdhani font-black text-xs text-[#FFD54F]">
+                <span>+</span>
+                <ScrapIcon size="xs" />
+                <span>{(outcomeSkin.price * 4).toFixed(2)}</span>
+              </div>
+            </div>
+          ) : wheelOutcome === 'win' && outcomeSkin ? (
+            /* B. REGULAR WIN DISPLAY */
             <div className="flex flex-col items-center text-center px-2 animate-fade-in">
               <div className="flex items-center gap-1 text-success-green font-black text-xs uppercase tracking-wider mb-0.5">
                 <CheckCircle className="w-3.5 h-3.5" />
@@ -275,12 +348,14 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
               <span className="text-[10px] font-bold text-white uppercase truncate max-w-[150px]">
                 {outcomeSkin.name}
               </span>
-              <span className="text-[11px] font-rajdhani font-black text-[#FFD54F]">
-                + ⚙️ {outcomeSkin.price.toFixed(2)}
-              </span>
+              <div className="flex items-center gap-1 font-rajdhani font-black text-xs text-[#FFD54F]">
+                <span>+</span>
+                <ScrapIcon size="xs" />
+                <span>{outcomeSkin.price.toFixed(2)}</span>
+              </div>
             </div>
           ) : wheelOutcome === 'lose' ? (
-            /* IN-WHEEL LOSS DISPLAY */
+            /* C. DEFEAT DISPLAY */
             <div className="flex flex-col items-center text-center px-2 animate-fade-in">
               <div className="w-10 h-10 rounded-full bg-red-600/20 border-2 border-primary-red flex items-center justify-center text-primary-red mb-1">
                 <XCircle className="w-6 h-6" />
@@ -293,7 +368,7 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
               </span>
             </div>
           ) : (
-            /* STANDARD IN-WHEEL PERCENTAGE (Фото 5) */
+            /* D. STANDARD IN-WHEEL PERCENTAGE (Фото 5) */
             <>
               {/* Subtle metal crosshair */}
               <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
@@ -359,11 +434,17 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
 
               <div
                 className={`
-                  mt-1.5 px-3 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase border
+                  mt-1 px-3 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase border
                   ${safetyStatus.color} ${safetyStatus.bg} border-current/30 shadow-sm
                 `}
               >
                 {safetyStatus.label}
+              </div>
+
+              {/* Golden Zone Hint Pill */}
+              <div className="mt-1 flex items-center gap-1 text-[9px] font-bold text-amber-300/80">
+                <Sparkles className="w-2.5 h-2.5 text-amber-400" />
+                <span>ЗОЛОТАЯ ЗОНА: 2% (X4)</span>
               </div>
             </>
           )}

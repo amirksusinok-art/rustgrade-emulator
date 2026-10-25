@@ -2,6 +2,7 @@ import React from 'react';
 import { AirdropReward } from '../../hooks/useAirdropTimer';
 import { Sparkles, Clock } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { ScrapIcon } from '../common/ScrapIcon';
 
 interface AirdropModalProps {
   isActive: boolean;
@@ -165,9 +166,10 @@ export const AirdropModal: React.FC<AirdropModalProps> = ({
 
             {/* Reward Display */}
             <div className="w-full bg-[#0D0F12] border border-[#232731] rounded-xl p-4 my-4 flex flex-col items-center gap-2">
-              <div className="font-rajdhani font-black text-3xl text-success-green flex items-center gap-1.5 drop-shadow">
+              <div className="font-rajdhani font-black text-3xl text-success-green flex items-center gap-2 drop-shadow">
                 <span>+{lastReward.scrap.toFixed(2)}</span>
-                <span className="text-xl">⚙️ Scrap</span>
+                <ScrapIcon size="md" />
+                <span className="text-xl">Scrap</span>
               </div>
 
               {lastReward.skin && (
@@ -183,8 +185,10 @@ export const AirdropModal: React.FC<AirdropModalProps> = ({
                   <span className="text-sm font-bold text-white">
                     {lastReward.skin.name}
                   </span>
-                  <span className="text-xs text-text-muted">
-                    Стоимость: ⚙️ {lastReward.skin.price.toFixed(2)}
+                  <span className="text-xs text-text-muted flex items-center gap-1">
+                    <span>Стоимость:</span>
+                    <ScrapIcon size="xs" />
+                    <span>{lastReward.skin.price.toFixed(2)}</span>
                   </span>
                 </div>
               )}

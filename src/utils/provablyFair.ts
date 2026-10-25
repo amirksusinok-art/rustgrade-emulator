@@ -1,11 +1,14 @@
 /**
  * Rustgrade Provably Fair Cryptographic Engine (HMAC-SHA256)
+ * Includes Authentic Golden Zone (X4 Bonus) mechanics
  */
 
 export interface FairResult {
   isWin: boolean;
+  isGoldenWin: boolean;
   roll: number;
   threshold: number;
+  goldenThreshold: number;
   landingAngle: number;
   hash: string;
 }
@@ -30,7 +33,8 @@ export async function calculateUpgradeRoll(
   serverSeed: string,
   clientSeed: string,
   nonce: number,
-  winProbability: number
+  winProbability: number,
+  goldenZonePercent: number = 2.0 // 2% Golden Zone on wheel
 ): Promise<FairResult> {
   const enc = new TextEncoder();
   const key = await crypto.subtle.importKey(
@@ -51,17 +55,28 @@ export async function calculateUpgradeRoll(
   const roll = parseInt(rollHex, 16);
   const max52Bits = 4503599627370496; // 2^52
 
+  // Normal win threshold
   const pScaled = Math.round(winProbability * 1000000);
   const threshold = Math.floor((pScaled * max52Bits) / 100000000);
 
-  const isWin = roll < threshold;
+  // Golden Zone threshold (first goldenZonePercent of the wheel)
+  const gScaled = Math.round(goldenZonePercent * 1000000);
+  const goldenThreshold = Math.floor((gScaled * max52Bits) / 100000000);
+
   const landingRatio = roll / max52Bits;
   const landingAngle = landingRatio * 360; // 0° - 360°
 
+  // Golden Win: lands inside Golden Zone
+  const isGoldenWin = roll < goldenThreshold;
+  // Win: lands inside total win probability sector
+  const isWin = roll < threshold;
+
   return {
     isWin,
+    isGoldenWin,
     roll,
     threshold,
+    goldenThreshold,
     landingAngle,
     hash: hexHash,
   };

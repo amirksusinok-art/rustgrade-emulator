@@ -3,6 +3,7 @@ import { InventoryItem, SkinDefinition } from '../../types';
 import { SKINS_DATA, SKINS_MAP } from '../../data/skinsData';
 import { ItemCard } from './ItemCard';
 import { ShoppingCart, ArrowUpDown, Trash2, Search, X } from 'lucide-react';
+import { ScrapIcon } from '../common/ScrapIcon';
 
 interface UserInventoryProps {
   inventory: InventoryItem[];
@@ -137,16 +138,18 @@ export const UserInventory: React.FC<UserInventoryProps> = ({
           {activeTab === 'inventory' ? (
             <div className="flex items-center gap-1.5 text-xs font-bold">
               <span className="text-text-muted uppercase text-[11px]">ВСЕГО СКИНОВ</span>
-              <span className="text-[#FFD54F] font-rajdhani font-black text-sm">
-                ⚙ {totalInvValue.toFixed(2)}
-              </span>
+              <div className="flex items-center gap-1 text-[#FFD54F] font-rajdhani font-black text-sm">
+                <ScrapIcon size="xs" />
+                <span>{totalInvValue.toFixed(2)}</span>
+              </div>
             </div>
           ) : (
             <div className="flex items-center gap-1.5 text-xs font-bold">
               <span className="text-text-muted uppercase text-[11px]">БАЛАНС:</span>
-              <span className="text-success-green font-rajdhani font-black text-sm">
-                ⚙ {userBalance.toFixed(2)}
-              </span>
+              <div className="flex items-center gap-1 text-success-green font-rajdhani font-black text-sm">
+                <ScrapIcon size="xs" />
+                <span>{userBalance.toFixed(2)}</span>
+              </div>
             </div>
           )}
 

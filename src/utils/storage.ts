@@ -14,21 +14,42 @@ export interface StoredFairState {
 
 export function getDefaultProfile(): UserProfile {
   const randomSuffix = Math.floor(10000 + Math.random() * 90000);
+  const now = Date.now();
   return {
     id: `RG_${randomSuffix}`,
     nickname: 'RustSurfer',
     avatar: 'scientist',
-    balance: 5.00,
+    balance: 25.00,
     inventory: [
       {
-        instanceId: `inst_${Date.now()}_starter_1`,
-        skinId: 'cloth',
-        acquiredAt: Date.now(),
+        instanceId: `inst_${now}_starter_1`,
+        skinId: 'duelist_wood_door',
+        acquiredAt: now,
       },
       {
-        instanceId: `inst_${Date.now()}_starter_2`,
-        skinId: 'blue_cap',
-        acquiredAt: Date.now(),
+        instanceId: `inst_${now}_starter_2`,
+        skinId: 'old_prisoner_pants',
+        acquiredAt: now + 1,
+      },
+      {
+        instanceId: `inst_${now}_starter_3`,
+        skinId: 'dragon_rage_kilt',
+        acquiredAt: now + 2,
+      },
+      {
+        instanceId: `inst_${now}_starter_4`,
+        skinId: 'camo_netting',
+        acquiredAt: now + 3,
+      },
+      {
+        instanceId: `inst_${now}_starter_5`,
+        skinId: 'plate_carrier___black',
+        acquiredAt: now + 4,
+      },
+      {
+        instanceId: `inst_${now}_starter_6`,
+        skinId: 'fire_jacket',
+        acquiredAt: now + 5,
       },
     ],
     stats: {
@@ -49,24 +70,20 @@ export function loadUserProfile(): UserProfile {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      const initial = getDefaultProfile();
-      saveUserProfile(initial);
-      return initial;
+      const def = getDefaultProfile();
+      saveUserProfile(def);
+      return def;
     }
     const parsed = JSON.parse(raw);
-    return {
-      ...getDefaultProfile(),
-      ...parsed,
-      stats: {
-        ...getDefaultProfile().stats,
-        ...(parsed.stats || {}),
-      },
-    };
-  } catch (e) {
-    console.error('[Storage] Failed to load profile, resetting:', e);
-    const initial = getDefaultProfile();
-    saveUserProfile(initial);
-    return initial;
+    // If user's inventory was completely empty or minimal, seed realistic Rust skins
+    if (!parsed.inventory || parsed.inventory.length === 0) {
+      parsed.inventory = getDefaultProfile().inventory;
+      if (!parsed.balance || parsed.balance < 5) parsed.balance = 25.00;
+      saveUserProfile(parsed);
+    }
+    return parsed;
+  } catch {
+    return getDefaultProfile();
   }
 }
 
@@ -75,47 +92,7 @@ export function saveUserProfile(profile: UserProfile): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
   } catch (e) {
-    console.error('[Storage] Failed to save profile:', e);
-  }
-}
-
-export async function initFairState(): Promise<StoredFairState> {
-  const serverSeed = generateRandomSeed(24);
-  const serverSeedHash = await sha256(serverSeed);
-  const clientSeed = generateRandomSeed(12);
-  const state: StoredFairState = {
-    currentServerSeed: serverSeed,
-    currentServerSeedHash: serverSeedHash,
-    clientSeed,
-    nonce: 1,
-  };
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(FAIR_KEY, JSON.stringify(state));
-  }
-  return state;
-}
-
-export async function loadFairState(): Promise<StoredFairState> {
-  if (typeof window === 'undefined') return initFairState();
-  try {
-    const raw = localStorage.getItem(FAIR_KEY);
-    if (!raw) return await initFairState();
-    const parsed = JSON.parse(raw);
-    if (!parsed.currentServerSeed || !parsed.currentServerSeedHash) {
-      return await initFairState();
-    }
-    return parsed;
-  } catch {
-    return await initFairState();
-  }
-}
-
-export function saveFairState(state: StoredFairState): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(FAIR_KEY, JSON.stringify(state));
-  } catch (e) {
-    console.error('[Storage] Failed to save fair state:', e);
+    console.warn('[Storage] Failed to save profile:', e);
   }
 }
 
@@ -134,6 +111,40 @@ export function saveRoundHistory(history: UpgradeRound[]): void {
   try {
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 50)));
   } catch (e) {
-    console.error('[Storage] Failed to save history:', e);
+    console.warn('[Storage] Failed to save history:', e);
+  }
+}
+
+export async function loadFairState(): Promise<StoredFairState> {
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = localStorage.getItem(FAIR_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch {
+      // Ignore
+    }
+  }
+
+  const serverSeed = generateRandomSeed(24);
+  const serverSeedHash = await sha256(serverSeed);
+  const clientSeed = generateRandomSeed(16);
+
+  const state: StoredFairState = {
+    currentServerSeed: serverSeed,
+    currentServerSeedHash: serverSeedHash,
+    clientSeed,
+    nonce: 1,
+  };
+
+  saveFairState(state);
+  return state;
+}
+
+export function saveFairState(state: StoredFairState): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(FAIR_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.warn('[Storage] Failed to save fair state:', e);
   }
 }

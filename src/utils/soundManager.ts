@@ -17,25 +17,26 @@ interface SoundConfig {
 }
 
 const SOUND_CONFIGS: Record<SoundId, SoundConfig> = {
-  barrel_hit: { file: '/audio/barrel_hit.mp3', volume: 0.8 },
-  fuse_burn: { file: '/audio/fuse_burn.mp3', volume: 0.7 },
-  wheel_tick: { file: '/audio/wheel_tick.mp3', volume: 0.45 },
-  win: { file: '/audio/win.mp3', volume: 0.9 },
-  jackpot: { file: '/audio/jackpot.mp3', volume: 1.0 },
-  lose: { file: '/audio/lose.mp3', volume: 0.8 },
-  item_select: { file: '/audio/item_select.mp3', volume: 0.6 },
-  scrap_sell: { file: '/audio/scrap_sell.mp3', volume: 0.75 },
-  codelock_error: { file: '/audio/codelock_error.mp3', volume: 0.7 },
+  barrel_hit: { file: '/audio/barrel_hit.mp3', volume: 0.75 },
+  fuse_burn: { file: '/audio/fuse_burn.mp3', volume: 0.65 },
+  wheel_tick: { file: '/audio/wheel_tick.mp3', volume: 0.4 },
+  win: { file: '/audio/win.mp3', volume: 0.85 },
+  jackpot: { file: '/audio/jackpot.mp3', volume: 0.95 },
+  lose: { file: '/audio/lose.mp3', volume: 0.75 },
+  item_select: { file: '/audio/item_select.mp3', volume: 0.55 },
+  scrap_sell: { file: '/audio/scrap_sell.mp3', volume: 0.7 },
+  codelock_error: { file: '/audio/codelock_error.mp3', volume: 0.65 },
   airdrop_plane: { file: '/audio/airdrop-plane.mp3', volume: 0.18 },
   airdrop_land: { file: '/audio/airdrop_land.mp3', volume: 0.22 },
 };
 
 class SoundManager {
   private isMuted: boolean = false;
-  private audioCache: Map<SoundId, HTMLAudioElement[]> = new Map();
-  private poolSize: number = 5;
+  private audioPool: Map<SoundId, HTMLAudioElement[]> = new Map();
+  private poolSize: number = 4;
   private listeners: Set<(muted: boolean) => void> = new Set();
   private wheelTickTimeouts: number[] = [];
+  private isUnlocked: boolean = false;
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -43,6 +44,17 @@ class SoundManager {
       if (savedMute !== null) {
         this.isMuted = savedMute === 'true';
       }
+
+      // Safe user interaction listener to unlock audio on first click
+      const unlockAudio = () => {
+        this.isUnlocked = true;
+        window.removeEventListener('click', unlockAudio);
+        window.removeEventListener('keydown', unlockAudio);
+        window.removeEventListener('touchstart', unlockAudio);
+      };
+      window.addEventListener('click', unlockAudio, { passive: true, once: true });
+      window.addEventListener('keydown', unlockAudio, { passive: true, once: true });
+      window.addEventListener('touchstart', unlockAudio, { passive: true, once: true });
     }
   }
 
@@ -52,13 +64,23 @@ class SoundManager {
   }
 
   private notify(): void {
-    this.listeners.forEach((listener) => listener(this.isMuted));
+    this.listeners.forEach((listener) => {
+      try {
+        listener(this.isMuted);
+      } catch {
+        // Ignore subscriber errors
+      }
+    });
   }
 
   public setMuted(muted: boolean): void {
     this.isMuted = muted;
     if (typeof window !== 'undefined') {
-      localStorage.setItem('rustgrade_muted', String(muted));
+      try {
+        localStorage.setItem('rustgrade_muted', String(muted));
+      } catch {
+        // Ignore storage errors
+      }
     }
     if (muted) {
       this.stopWheelTicks();
@@ -75,6 +97,9 @@ class SoundManager {
     return this.isMuted;
   }
 
+  /**
+   * Safely play sound with zero uncaught promise rejections
+   */
   public play(id: SoundId): void {
     if (this.isMuted || typeof window === 'undefined') return;
 
@@ -82,53 +107,57 @@ class SoundManager {
     if (!config) return;
 
     try {
-      if (!this.audioCache.has(id)) {
-        this.audioCache.set(id, []);
+      if (!this.audioPool.has(id)) {
+        this.audioPool.set(id, []);
       }
 
-      const pool = this.audioCache.get(id)!;
+      const pool = this.audioPool.get(id)!;
       let audio = pool.find((a) => a.paused || a.ended);
 
       if (!audio) {
         if (pool.length < this.poolSize) {
           audio = new Audio(config.file);
-          audio.volume = config.volume;
+          audio.preload = 'auto';
           pool.push(audio);
         } else {
           audio = pool[0];
-          audio.currentTime = 0;
+          try {
+            audio.pause();
+            audio.currentTime = 0;
+          } catch {
+            // Ignore
+          }
         }
       }
 
-      audio.currentTime = 0;
       audio.volume = config.volume;
+      audio.currentTime = 0;
+
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise.catch(() => {
-          // Ignore auto-play restriction before user interaction
+          // Silent swallow: browser autoplay policies without error logs
         });
       }
-    } catch (e) {
-      console.warn(`[SoundManager] Error playing ${id}:`, e);
+    } catch {
+      // Safe fallback
     }
   }
 
   /**
-   * Schedules a realistic sequence of ticks that decelerates over the spin duration.
+   * Schedules a synchronized sequence of ticks that decelerates over the spin duration.
    */
   public startWheelTicks(durationMs: number): void {
     this.stopWheelTicks();
-    if (this.isMuted) return;
+    if (this.isMuted || typeof window === 'undefined') return;
 
-    // Generate tick times based on cubic-bezier deceleration
-    const totalTicks = durationMs < 1200 ? 14 : 32;
+    const totalTicks = durationMs < 1200 ? 14 : 34;
     let accumulatedTime = 0;
 
     for (let i = 0; i < totalTicks; i++) {
       const progress = i / totalTicks;
-      // Interval increases as wheel slows down (from ~40ms to ~250ms)
       const baseInterval = durationMs < 1200 ? 25 : 45;
-      const expansion = Math.pow(progress, 2.5) * (durationMs < 1200 ? 160 : 320);
+      const expansion = Math.pow(progress, 2.6) * (durationMs < 1200 ? 170 : 340);
       const interval = baseInterval + expansion;
 
       accumulatedTime += interval;

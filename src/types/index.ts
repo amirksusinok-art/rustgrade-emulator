@@ -58,6 +58,7 @@ export interface UpgradeRound {
   roll: number;
   threshold: number;
   isWin: boolean;
+  isGoldenWin?: boolean;
   landingAngle: number;
 }
 

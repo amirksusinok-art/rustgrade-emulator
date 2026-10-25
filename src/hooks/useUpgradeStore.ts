@@ -22,7 +22,7 @@ export function useUpgradeStore() {
   const [fairState, setFairState] = useState<StoredFairState | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
-  const [wheelOutcome, setWheelOutcome] = useState<'idle' | 'win' | 'lose'>('idle');
+  const [wheelOutcome, setWheelOutcome] = useState<'idle' | 'win' | 'lose' | 'golden_win'>('idle');
   const [outcomeSkin, setOutcomeSkin] = useState<SkinDefinition | null>(null);
 
   // Initialize Fair State & History
@@ -243,35 +243,40 @@ export function useUpgradeStore() {
       soundManager.stopWheelTicks();
       setIsSpinning(false);
 
-      const isJackpot = fairResult.isWin && (winProbability < 10.0 || targetSkin.rarity === 'contraband');
+      if (fairResult.isGoldenWin) {
+        // GOLDEN ZONE HIT! X4 MULTIPLIER JACKPOT!
+        setWheelOutcome('golden_win');
+        setOutcomeSkin(targetSkin);
+        soundManager.play('jackpot');
+        try {
+          confetti({
+            particleCount: 220,
+            spread: 100,
+            origin: { y: 0.5 },
+            colors: ['#FFD700', '#FFA500', '#FF8C00', '#FFF8DC', '#FFFFFF'],
+          });
+        } catch {
+          // Confetti fallback
+        }
 
-      if (fairResult.isWin) {
+        // Add 4x copies of won skin to inventory
+        addSkin(targetSkin.id);
+        addSkin(targetSkin.id);
+        addSkin(targetSkin.id);
+        addSkin(targetSkin.id);
+      } else if (fairResult.isWin) {
         setWheelOutcome('win');
         setOutcomeSkin(targetSkin);
-        if (isJackpot) {
-          soundManager.play('jackpot');
-          try {
-            confetti({
-              particleCount: 150,
-              spread: 90,
-              origin: { y: 0.5 },
-              colors: ['#FFB800', '#FF9800', '#E53935', '#FFFFFF'],
-            });
-          } catch {
-            // Confetti fallback
-          }
-        } else {
-          soundManager.play('win');
-          try {
-            confetti({
-              particleCount: 80,
-              spread: 70,
-              origin: { y: 0.5 },
-              colors: ['#4CAF50', '#FFD54F', '#FFFFFF'],
-            });
-          } catch {
-            // Confetti fallback
-          }
+        soundManager.play('win');
+        try {
+          confetti({
+            particleCount: 90,
+            spread: 70,
+            origin: { y: 0.5 },
+            colors: ['#4CAF50', '#FFD54F', '#FFFFFF'],
+          });
+        } catch {
+          // Confetti fallback
         }
 
         // Add won skin to inventory
@@ -282,10 +287,10 @@ export function useUpgradeStore() {
         soundManager.play('lose');
       }
 
-      // Automatically reset wheel outcome to 'idle' after 4.5 seconds
+      // Automatically reset wheel outcome to 'idle' after 5 seconds
       setTimeout(() => {
         setWheelOutcome('idle');
-      }, 4500);
+      }, 5000);
 
       // Deduct scrap & items
       if (scrapSlider > 0) {
@@ -312,6 +317,7 @@ export function useUpgradeStore() {
         roll: fairResult.roll,
         threshold: fairResult.threshold,
         isWin: fairResult.isWin,
+        isGoldenWin: fairResult.isGoldenWin,
         landingAngle: fairResult.landingAngle,
       };
 
