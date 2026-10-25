@@ -75,6 +75,16 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   const [selectedRarity, setSelectedRarity] = useState<string>('all');
   const [spawnerFeedback, setSpawnerFeedback] = useState<string | null>(null);
 
+  // Spawner memoized list
+  const filteredSkins = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    return SKINS_DATA.filter((s) => {
+      if (selectedRarity !== 'all' && s.rarity !== selectedRarity) return false;
+      if (q && !s.name.toLowerCase().includes(q) && !s.type.toLowerCase().includes(q)) return false;
+      return true;
+    }).slice(0, 48); // performance cap
+  }, [searchQuery, selectedRarity]);
+
   // Sync Rigging from manager
   useEffect(() => {
     const unsub = adminManager.subscribe((st) => setRigging(st));
@@ -88,8 +98,6 @@ export const AdminModal: React.FC<AdminModalProps> = ({
       setSlotsList(adminManager.getAllSlots());
     }
   }, [isOpen]);
-
-  if (!isOpen) return null;
 
   // Handle Password Submit
   const handleLoginSubmit = (e?: React.FormEvent) => {
@@ -184,16 +192,6 @@ export const AdminModal: React.FC<AdminModalProps> = ({
     adminManager.setWheelSpeed(speed);
   };
 
-  // Spawner
-  const filteredSkins = useMemo(() => {
-    const q = searchQuery.toLowerCase().trim();
-    return SKINS_DATA.filter((s) => {
-      if (selectedRarity !== 'all' && s.rarity !== selectedRarity) return false;
-      if (q && !s.name.toLowerCase().includes(q) && !s.type.toLowerCase().includes(q)) return false;
-      return true;
-    }).slice(0, 48); // performance cap
-  }, [searchQuery, selectedRarity]);
-
   const handleSpawnSkin = (skin: SkinDefinition) => {
     onAddSkin(skin.id);
     soundManager.play('item_select');
@@ -245,6 +243,8 @@ export const AdminModal: React.FC<AdminModalProps> = ({
       window.location.reload();
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in select-none">
