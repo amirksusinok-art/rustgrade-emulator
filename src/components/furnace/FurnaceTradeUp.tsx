@@ -4,7 +4,8 @@ import { SKINS_DATA, SKINS_MAP } from '../../data/skinsData';
 import { soundManager } from '../../utils/soundManager';
 import { ScrapIcon } from '../common/ScrapIcon';
 import { ItemCard } from '../inventory/ItemCard';
-import { Flame, Zap, Check, RotateCcw, AlertTriangle, Sparkles, ChevronRight, X } from 'lucide-react';
+import { FlatElectricFurnace } from './FlatElectricFurnace';
+import { Flame, Zap, RotateCcw, AlertTriangle, Sparkles, ChevronRight, X, TrendingUp, TrendingDown } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface FurnaceTradeUpProps {
@@ -42,6 +43,14 @@ const RARITY_LABELS: Record<ItemRarity, { name: string; color: string; border: s
   contraband: { name: 'КОНТРАБАНДА (ЗОЛОТОЙ)', color: 'text-[#FFD54F]', border: 'border-[#FFB800]', bg: 'bg-[#382B0D]' },
 };
 
+interface TradeUpResult {
+  skin: SkinDefinition;
+  spent: number;
+  profit: number;
+  isProfit: boolean;
+  multiplier: number;
+}
+
 export const FurnaceTradeUp: React.FC<FurnaceTradeUpProps> = ({
   inventory,
   userBalance,
@@ -54,7 +63,7 @@ export const FurnaceTradeUp: React.FC<FurnaceTradeUpProps> = ({
   const [selectedRarity, setSelectedRarity] = useState<ItemRarity>('industrial');
   const [selectedInstanceIds, setSelectedInstanceIds] = useState<string[]>([]);
   const [isSmelting, setIsSmelting] = useState<boolean>(false);
-  const [smeltOutcome, setSmeltOutcome] = useState<SkinDefinition | null>(null);
+  const [smeltResult, setSmeltResult] = useState<TradeUpResult | null>(null);
 
   const nextRarity = RARITY_NEXT[selectedRarity];
 
@@ -80,6 +89,21 @@ export const FurnaceTradeUp: React.FC<FurnaceTradeUpProps> = ({
       return sum + (skin ? skin.price : 0);
     }, 0);
   }, [selectedInstanceIds, inventory]);
+
+  // Statistics for possible outcomes: Min, Max, Profit probability
+  const poolStats = useMemo(() => {
+    if (targetPool.length === 0) {
+      return { min: 0, max: 0, profitChance: 0, profitableCount: 0 };
+    }
+    const prices = targetPool.map((s) => s.price);
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+
+    const profitableCount = targetPool.filter((s) => s.price >= (totalInputValue > 0 ? totalInputValue : 1)).length;
+    const profitChance = Math.round((profitableCount / targetPool.length) * 100);
+
+    return { min, max, profitChance, profitableCount };
+  }, [targetPool, totalInputValue]);
 
   // Toggle item selection
   const handleToggleItem = (instanceId: string) => {
@@ -130,45 +154,59 @@ export const FurnaceTradeUp: React.FC<FurnaceTradeUpProps> = ({
       return;
     }
 
+    const currentSpent = totalInputValue;
     setIsSmelting(true);
-    setSmeltOutcome(null);
+    setSmeltResult(null);
 
-    // 1. Play turn-on surge
+    // 1. Play turn-on electric switch surge
     soundManager.play('furnace_turn_on');
 
-    // 2. Start electric furnace heat loop
+    // 2. Start furnace heating loop
     soundManager.play('furnace_loop');
 
-    // Pick random outcome from the next tier pool
+    // Pick a random outcome from the next tier pool (authentic market distribution)
     const pickedSkin = targetPool[Math.floor(Math.random() * targetPool.length)];
+    const profit = pickedSkin.price - currentSpent;
+    const isProfit = profit >= 0;
+    const multiplier = currentSpent > 0 ? Number((pickedSkin.price / currentSpent).toFixed(2)) : 1.0;
 
-    // Wait 2.8s for smelting animation
+    // Smelt animation duration (2.8s)
     setTimeout(() => {
       soundManager.stop('furnace_loop');
-      soundManager.play('win');
 
-      try {
-        confetti({
-          particleCount: 120,
-          spread: 80,
-          origin: { y: 0.5 },
-          colors: ['#FF9800', '#FFB800', '#E53935', '#FFFFFF'],
-        });
-      } catch {
-        // Confetti fallback
+      if (isProfit) {
+        soundManager.play('win');
+        try {
+          confetti({
+            particleCount: 120,
+            spread: 80,
+            origin: { y: 0.5 },
+            colors: ['#FF9800', '#FFB800', '#4CAF50', '#FFFFFF'],
+          });
+        } catch {
+          // Confetti fallback
+        }
+      } else {
+        soundManager.play('lose');
       }
 
-      setSmeltOutcome(pickedSkin);
+      setSmeltResult({
+        skin: pickedSkin,
+        spent: currentSpent,
+        profit,
+        isProfit,
+        multiplier,
+      });
       setIsSmelting(false);
 
-      // Apply changes to store
+      // Apply changes to user profile
       onTradeUp(selectedInstanceIds, pickedSkin.id);
       setSelectedInstanceIds([]);
     }, 2800);
   };
 
   const handleResetOutcome = () => {
-    setSmeltOutcome(null);
+    setSmeltResult(null);
   };
 
   return (
@@ -184,7 +222,7 @@ export const FurnaceTradeUp: React.FC<FurnaceTradeUpProps> = ({
           </h2>
         </div>
         <p className="text-xs text-text-muted max-w-lg">
-          Загрузите {requiredCount} предметов одного тира для переплавки в 1 случайный скин следующего уровня редкости (Trade-Up Contract).
+          Загрузите {requiredCount} предметов для переплавки в скин следующего тира. Дроп случаен: крафт может принести как солидный куш, так и уйти в минус!
         </p>
       </div>
 
@@ -206,6 +244,7 @@ export const FurnaceTradeUp: React.FC<FurnaceTradeUpProps> = ({
                 onClick={() => {
                   setSelectedRarity(rarity);
                   setSelectedInstanceIds([]);
+                  setSmeltResult(null);
                   soundManager.play('item_select');
                 }}
                 className={`
@@ -256,51 +295,61 @@ export const FurnaceTradeUp: React.FC<FurnaceTradeUpProps> = ({
 
       {/* Main Furnace Smelting Stage */}
       <div className="w-full max-w-4xl bg-[#12141A]/95 border border-[#232731] rounded-2xl p-4 md:p-6 shadow-2xl relative overflow-hidden mb-6">
-        {/* Smelting Ambient Flare Glow */}
-        <div
-          className={`
-            absolute inset-0 pointer-events-none transition-all duration-700
-            ${
-              isSmelting
-                ? 'bg-radial-gradient from-amber-600/30 via-orange-950/20 to-transparent opacity-100'
-                : 'opacity-0'
-            }
-          `}
-        />
-
-        {smeltOutcome ? (
-          /* Victory Outcome Screen */
+        {smeltResult ? (
+          /* Result Outcome Screen: Clear Profit or Loss Banner */
           <div className="flex flex-col items-center text-center py-6 animate-fade-in z-10 relative">
-            <div className="flex items-center gap-1.5 text-success-green font-rajdhani font-black text-sm uppercase tracking-widest mb-1">
-              <Sparkles className="w-4 h-4" />
-              <span>ПЕРЕПЛАВКА УСПЕШНА! ВЫКОВАН НОВЫЙ СКИН</span>
-            </div>
+            {/* Profit or Loss Status Badge */}
+            {smeltResult.isProfit ? (
+              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/60 text-emerald-300 font-rajdhani font-black text-sm uppercase tracking-wider shadow-[0_0_20px_rgba(16,185,129,0.4)] mb-2">
+                <TrendingUp className="w-4 h-4 text-emerald-400 stroke-[3]" />
+                <span>ОКУПИЛОСЬ! (+{smeltResult.profit.toFixed(2)} Scrap, X{smeltResult.multiplier})</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-950/80 border border-red-500/60 text-red-300 font-rajdhani font-black text-sm uppercase tracking-wider shadow-[0_0_20px_rgba(239,68,68,0.4)] mb-2">
+                <TrendingDown className="w-4 h-4 text-red-400 stroke-[3]" />
+                <span>НЕ ОКУПИЛОСЬ ({smeltResult.profit.toFixed(2)} Scrap)</span>
+              </div>
+            )}
 
+            {/* Dropped Skin Image */}
             <div className="relative my-4 w-48 h-48 flex items-center justify-center">
-              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-500/30 to-orange-600/20 blur-xl animate-pulse" />
+              <div
+                className={`absolute inset-0 rounded-full blur-xl animate-pulse ${
+                  smeltResult.isProfit ? 'bg-amber-500/30' : 'bg-red-500/20'
+                }`}
+              />
               <img
-                src={`/images/skins/${smeltOutcome.localFile}`}
-                alt={smeltOutcome.name}
+                src={`/images/skins/${smeltResult.skin.localFile}`}
+                alt={smeltResult.skin.name}
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = smeltOutcome.iconUrl;
+                  (e.target as HTMLImageElement).src = smeltResult.skin.iconUrl;
                 }}
-                className="max-h-40 max-w-full object-contain scale-125 drop-shadow-[0_12px_24px_rgba(255,152,0,0.6)] animate-bounce"
+                className="max-h-40 max-w-full object-contain scale-125 drop-shadow-[0_12px_24px_rgba(0,0,0,0.9)] animate-bounce"
               />
             </div>
 
             <h3 className="font-rajdhani font-black text-2xl text-white uppercase tracking-wider">
-              {smeltOutcome.name}
+              {smeltResult.skin.name}
             </h3>
 
             <div className="flex items-center gap-2 mt-1 mb-4">
-              <span className={`text-xs font-bold uppercase tracking-wider ${RARITY_LABELS[smeltOutcome.rarity].color}`}>
-                {smeltOutcome.type} • {RARITY_LABELS[smeltOutcome.rarity].name}
+              <span className={`text-xs font-bold uppercase tracking-wider ${RARITY_LABELS[smeltResult.skin.rarity].color}`}>
+                {smeltResult.skin.type} • {RARITY_LABELS[smeltResult.skin.rarity].name}
               </span>
               <span className="text-zinc-600">|</span>
               <div className="flex items-center gap-1 font-rajdhani font-black text-base text-[#FFD54F]">
                 <ScrapIcon size="sm" />
-                <span>{smeltOutcome.price.toFixed(2)}</span>
+                <span>{smeltResult.skin.price.toFixed(2)}</span>
               </div>
+            </div>
+
+            {/* Price breakdown pill */}
+            <div className="flex items-center gap-3 px-4 py-1.5 rounded-lg bg-[#0D0F12] border border-[#232731] text-xs font-mono text-text-muted mb-4">
+              <span>Вложено: {smeltResult.spent.toFixed(2)} Scrap</span>
+              <span>➔</span>
+              <span className={smeltResult.isProfit ? 'text-emerald-400 font-bold' : 'text-red-400 font-bold'}>
+                Получено: {smeltResult.skin.price.toFixed(2)} Scrap
+              </span>
             </div>
 
             <div className="flex items-center gap-3">
@@ -315,48 +364,13 @@ export const FurnaceTradeUp: React.FC<FurnaceTradeUpProps> = ({
         ) : (
           /* Active Furnace & Slots Stage */
           <div className="flex flex-col items-center">
-            {/* Center: The Rust Electric Furnace 3D Model */}
-            <div className="relative flex flex-col items-center my-2">
-              {/* Electric Heat Radiance Behind Grate */}
-              <div
-                className={`
-                  absolute -inset-4 rounded-full transition-all duration-500 pointer-events-none
-                  ${
-                    isSmelting
-                      ? 'bg-orange-500/40 blur-2xl animate-pulse scale-110'
-                      : 'bg-amber-600/10 blur-xl'
-                  }
-                `}
-              />
-
-              {/* The Electric Furnace Image (from uploaded media) */}
-              <div className="relative w-44 h-52 flex items-center justify-center">
-                <img
-                  src="/images/electric_furnace.png"
-                  alt="Rust Electric Furnace"
-                  className={`
-                    w-full h-full object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.95)] transition-transform duration-300
-                    ${isSmelting ? 'scale-105 filter brightness-125' : 'hover:scale-102'}
-                  `}
-                />
-
-                {/* Internal Fiery Grate Glow when Smelting */}
-                {isSmelting && (
-                  <div className="absolute inset-x-12 top-20 bottom-14 bg-gradient-to-t from-orange-600 via-amber-400 to-yellow-200 opacity-90 blur-[3px] mix-blend-screen pointer-events-none animate-pulse" />
-                )}
-              </div>
-
-              {/* Furnace Status Pill */}
-              <div className="mt-2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0D0F12] border border-[#232731] text-[11px] font-rajdhani font-black">
-                <span className={`w-2 h-2 rounded-full ${isSmelting ? 'bg-orange-500 animate-ping' : 'bg-emerald-500'}`} />
-                <span className="text-white uppercase tracking-wider">
-                  {isSmelting ? 'ИДЁТ ПЕРЕПЛАВКА...' : 'ПЕЧЬ ГОТОВА К ЗАГРУЗКЕ'}
-                </span>
-              </div>
+            {/* Center: The Flat 2D Electric Furnace (Вид строго спереди, без искажения) */}
+            <div className="my-1">
+              <FlatElectricFurnace isSmelting={isSmelting} />
             </div>
 
             {/* Input Slots Grid (5 or 10 slots) */}
-            <div className="w-full my-4">
+            <div className="w-full my-3">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-1 text-xs font-bold text-text-muted">
                   <span className="uppercase">СЛОТЫ ПЕЧИ:</span>
@@ -451,18 +465,51 @@ export const FurnaceTradeUp: React.FC<FurnaceTradeUpProps> = ({
               </div>
             </div>
 
-            {/* Smelt Action Bar */}
-            <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-[#232731]">
+            {/* Risk & Profit Odds Pre-flight Bar */}
+            <div className="w-full bg-[#0D0F12] border border-[#232731] rounded-lg p-2.5 my-2 flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-text-muted uppercase">ЦЕННОСТЬ ПЛАВКИ:</span>
+                <span className="text-text-muted uppercase font-bold">ВЛОЖЕНИЯ:</span>
                 <div className="flex items-center gap-1 font-rajdhani font-black text-sm text-[#FFD54F]">
                   <ScrapIcon size="xs" />
                   <span>{totalInputValue.toFixed(2)}</span>
                 </div>
+              </div>
+
+              {nextRarity && targetPool.length > 0 && (
+                <>
+                  <div className="flex items-center gap-2">
+                    <span className="text-text-muted uppercase font-bold">ВОЗМОЖНЫЙ ДРОП:</span>
+                    <span className="font-rajdhani font-black text-white text-sm">
+                      {poolStats.min.toFixed(2)} – {poolStats.max.toFixed(2)} Scrap
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-text-muted uppercase font-bold">ШАНС ОКУПА:</span>
+                    <span
+                      className={`font-rajdhani font-black text-sm px-2 py-0.5 rounded ${
+                        poolStats.profitChance >= 50
+                          ? 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-400'
+                          : poolStats.profitChance >= 25
+                          ? 'bg-amber-950/60 border border-amber-500/40 text-amber-400'
+                          : 'bg-red-950/60 border border-red-500/40 text-red-400'
+                      }`}
+                    >
+                      {totalInputValue > 0 ? `${poolStats.profitChance}%` : '—'}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Smelt Action Bar */}
+            <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-[#232731]">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-text-muted">
                 {nextRarity && (
-                  <div className="flex items-center gap-1 text-xs font-bold text-text-muted ml-2">
+                  <div className="flex items-center gap-1">
                     <ChevronRight className="w-3.5 h-3.5 text-[#FF9800]" />
                     <span className="uppercase text-white">ВЫХОД: {RARITY_LABELS[nextRarity].name.split(' ')[0]}</span>
+                    <span className="text-[11px] text-zinc-500">({targetPool.length} вариантов в пуле)</span>
                   </div>
                 )}
               </div>
@@ -525,7 +572,7 @@ export const FurnaceTradeUp: React.FC<FurnaceTradeUpProps> = ({
               У вас нет скинов категории «{RARITY_LABELS[selectedRarity].name.split(' ')[0]}»
             </span>
             <p className="text-[11px] text-text-muted max-w-sm mt-1">
-              Купите недорогие скины этого тира в магазине за Scrap или выиграйте их в апгрейде!
+              Купите недорогие скины этого тира во вкладке магазина инвентаря за Scrap или выиграйте в апгрейде!
             </p>
           </div>
         ) : (
