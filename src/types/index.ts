@@ -22,22 +22,34 @@ export interface InventoryItem {
   acquiredAt: number;
 }
 
+export interface StakedSkinItem {
+  instanceId: string;
+  skinId: string;
+  stakedAt: number;
+  yieldPerHour: number;
+}
+
 export interface UserStats {
   totalUpgrades: number;
   totalWins: number;
   totalLosses: number;
   totalScrapEarned: number;
   totalAirdropsClaimed: number;
+  totalCasesOpened?: number;
   bestDropChance: number | null;
   bestDropSkinId: string | null;
+  bestDropMultiplier?: number | null;
 }
 
 export interface UserProfile {
   id: string;
+  steamId?: string;
   nickname: string;
   avatar: string;
   balance: number;
   inventory: InventoryItem[];
+  stakedItems?: StakedSkinItem[];
+  lastYieldClaimAt?: number;
   stats: UserStats;
   usedPromoCodes: string[];
 }

@@ -17,6 +17,7 @@ interface CaseRouletteModalProps {
   onAddScrap: (amount: number) => void;
   onAddSkin: (skinId: string) => string;
   onSendToUpgrader: (skinId: string) => void;
+  onRecordCaseOpened?: () => void;
 }
 
 export const CaseRouletteModal: React.FC<CaseRouletteModalProps> = ({
@@ -29,6 +30,7 @@ export const CaseRouletteModal: React.FC<CaseRouletteModalProps> = ({
   onAddScrap,
   onAddSkin,
   onSendToUpgrader,
+  onRecordCaseOpened,
 }) => {
   const [isRolling, setIsRolling] = useState<boolean>(false);
   const [turboMode, setTurboMode] = useState<boolean>(false);
@@ -147,6 +149,7 @@ export const CaseRouletteModal: React.FC<CaseRouletteModalProps> = ({
     setIsRolling(true);
     setWonSkin(null);
     soundManager.play('fuse_burn');
+    if (onRecordCaseOpened) onRecordCaseOpened();
 
     // Pick winner
     const winningSkin = pickWinningSkin();

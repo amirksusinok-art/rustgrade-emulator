@@ -2,6 +2,51 @@
 
 export const SKINS_DATA: SkinDefinition[] = [
     {
+        "id": "titanium_crown_facemask",
+        "name": "Titanium Crown Facemask",
+        "type": "Mythic Artifact",
+        "price": 150000.0,
+        "rarity": "contraband",
+        "iconUrl": "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Fc5GLGfCk4nReh8DEiv5daMag5qLU2QPi5xVewp5A/360fx360f",
+        "localFile": "elite_crate_facemask.png"
+    },
+    {
+        "id": "god_of_rust_chestplate",
+        "name": "God of Rust Heavy Chestplate",
+        "type": "Mythic Armor",
+        "price": 100000.0,
+        "rarity": "contraband",
+        "iconUrl": "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Fe5GLEfCk4nReh8DEiv5daPq0_qrw_QfG9O-tu0Dw/360fx360f",
+        "localFile": "the_awakened_chestplate.png"
+    },
+    {
+        "id": "immortal_skull_mask",
+        "name": "Immortal Skull Mask",
+        "type": "Mythic Mask",
+        "price": 75000.0,
+        "rarity": "contraband",
+        "iconUrl": "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Fc5GLGfCk4nReh8DEiv5daMag5qLU2QPi5xVewp5A/360fx360f",
+        "localFile": "black_ops_metal_facemask.png"
+    },
+    {
+        "id": "platinum_dragon_lr300",
+        "name": "Platinum Dragon LR-300",
+        "type": "LR-300 Rifle",
+        "price": 50000.0,
+        "rarity": "contraband",
+        "iconUrl": "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Fe5GPHfCk4nReh8DEiv5dbOak6qLY-QPy_bsF4fKg/360fx360f",
+        "localFile": "dragon_rage_chestplate.png"
+    },
+    {
+        "id": "dark_matter_ak47",
+        "name": "Dark Matter AK-47",
+        "type": "Assault Rifle",
+        "price": 35000.0,
+        "rarity": "contraband",
+        "iconUrl": "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Fe5GLEfCk4nReh8DEiv5daPq0_qrw_QfG9O-tu0Dw/360fx360f",
+        "localFile": "crypt_of_death_ak47.png"
+    },
+    {
         "id": "helks_golden_facemask",
         "name": "Helk's Golden Facemask",
         "type": "Mythic Mask",

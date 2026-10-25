@@ -13,6 +13,23 @@ function updateProfile(newProfile: UserProfile) {
   listeners.forEach((listener) => listener(globalProfile));
 }
 
+export function calculateSkinYield(skinId: string): number {
+  const skin = SKINS_MAP[skinId];
+  if (!skin) return 0;
+  if (skin.id === 'titanium_crown_facemask') return 750.0;
+  if (skin.id === 'god_of_rust_chestplate') return 500.0;
+  if (skin.id === 'immortal_skull_mask') return 375.0;
+  if (skin.id === 'platinum_dragon_lr300') return 250.0;
+  if (skin.id === 'dark_matter_ak47') return 175.0;
+  if (skin.id === 'helks_golden_facemask') return 100.0;
+  if (skin.id === 'golden_dragon_lr300') return 60.0;
+  if (skin.id === 'glory_facemask') return 40.0;
+  if (skin.id === 'tempered_ak47') return 30.0;
+  if (skin.id === 'big_grin') return 25.0;
+  if (skin.price >= 50) return Math.max(0.25, Number((skin.price * 0.005).toFixed(2)));
+  return 0;
+}
+
 export function useUserStore() {
   const [profile, setProfile] = useState<UserProfile>(globalProfile);
 
@@ -261,6 +278,125 @@ export function useUserStore() {
     return true;
   }, []);
 
+  // Staking & Skin Lending
+  const stakeSkin = useCallback((instanceId: string): boolean => {
+    const item = globalProfile.inventory.find((i) => i.instanceId === instanceId);
+    if (!item) return false;
+
+    const yieldRate = calculateSkinYield(item.skinId);
+    if (yieldRate <= 0) return false;
+
+    // First auto-claim pending yield before adding new skin to prevent timestamp skew
+    const now = Date.now();
+    const currentStaked = globalProfile.stakedItems || [];
+    const hourlyRate = currentStaked.reduce((s, i) => s + (i.yieldPerHour || 0), 0);
+    const elapsedHours = Math.max(0, (now - (globalProfile.lastYieldClaimAt || now)) / 3600000);
+    const pendingEarned = Number((hourlyRate * elapsedHours).toFixed(2));
+
+    const newStakedItem = {
+      instanceId: item.instanceId,
+      skinId: item.skinId,
+      stakedAt: now,
+      yieldPerHour: yieldRate,
+    };
+
+    soundManager.play('barrel_hit');
+
+    const updated: UserProfile = {
+      ...globalProfile,
+      balance: Number((globalProfile.balance + pendingEarned).toFixed(2)),
+      inventory: globalProfile.inventory.filter((i) => i.instanceId !== instanceId),
+      stakedItems: [newStakedItem, ...currentStaked],
+      lastYieldClaimAt: now,
+      stats: {
+        ...globalProfile.stats,
+        totalScrapEarned: Number((globalProfile.stats.totalScrapEarned + pendingEarned).toFixed(2)),
+      },
+    };
+    updateProfile(updated);
+    return true;
+  }, []);
+
+  const unstakeSkin = useCallback((instanceId: string): boolean => {
+    const currentStaked = globalProfile.stakedItems || [];
+    const item = currentStaked.find((i) => i.instanceId === instanceId);
+    if (!item) return false;
+
+    const now = Date.now();
+    const hourlyRate = currentStaked.reduce((s, i) => s + (i.yieldPerHour || 0), 0);
+    const elapsedHours = Math.max(0, (now - (globalProfile.lastYieldClaimAt || now)) / 3600000);
+    const pendingEarned = Number((hourlyRate * elapsedHours).toFixed(2));
+
+    soundManager.play('item_select');
+
+    const returnedItem = {
+      instanceId: item.instanceId,
+      skinId: item.skinId,
+      acquiredAt: now,
+    };
+
+    const updated: UserProfile = {
+      ...globalProfile,
+      balance: Number((globalProfile.balance + pendingEarned).toFixed(2)),
+      inventory: [returnedItem, ...globalProfile.inventory],
+      stakedItems: currentStaked.filter((i) => i.instanceId !== instanceId),
+      lastYieldClaimAt: now,
+      stats: {
+        ...globalProfile.stats,
+        totalScrapEarned: Number((globalProfile.stats.totalScrapEarned + pendingEarned).toFixed(2)),
+      },
+    };
+    updateProfile(updated);
+    return true;
+  }, []);
+
+  const claimStakingYield = useCallback((): number => {
+    const currentStaked = globalProfile.stakedItems || [];
+    if (currentStaked.length === 0) return 0;
+
+    const now = Date.now();
+    const hourlyRate = currentStaked.reduce((s, i) => s + (i.yieldPerHour || 0), 0);
+    const elapsedHours = Math.max(0, (now - (globalProfile.lastYieldClaimAt || now)) / 3600000);
+    const pendingEarned = Number((hourlyRate * elapsedHours).toFixed(2));
+
+    if (pendingEarned <= 0) return 0;
+
+    soundManager.play('scrap_sell');
+
+    const updated: UserProfile = {
+      ...globalProfile,
+      balance: Number((globalProfile.balance + pendingEarned).toFixed(2)),
+      lastYieldClaimAt: now,
+      stats: {
+        ...globalProfile.stats,
+        totalScrapEarned: Number((globalProfile.stats.totalScrapEarned + pendingEarned).toFixed(2)),
+      },
+    };
+    updateProfile(updated);
+    return pendingEarned;
+  }, []);
+
+  const updateProfileDetails = useCallback((nickname: string, steamId: string, avatar?: string) => {
+    const updated: UserProfile = {
+      ...globalProfile,
+      nickname: nickname.trim() || globalProfile.nickname,
+      steamId: steamId.trim() || globalProfile.steamId || globalProfile.id,
+      avatar: avatar || globalProfile.avatar,
+    };
+    updateProfile(updated);
+  }, []);
+
+  const recordCaseOpened = useCallback(() => {
+    const updated: UserProfile = {
+      ...globalProfile,
+      stats: {
+        ...globalProfile.stats,
+        totalCasesOpened: (globalProfile.stats.totalCasesOpened || 0) + 1,
+      },
+    };
+    updateProfile(updated);
+  }, []);
+
   const resetProgress = useCallback(() => {
     const fresh = getDefaultProfile();
     updateProfile(fresh);
@@ -304,6 +440,11 @@ export function useUserStore() {
     sellAllSkins,
     updateAvatar,
     updateNickname,
+    updateProfileDetails,
+    stakeSkin,
+    unstakeSkin,
+    claimStakingYield,
+    recordCaseOpened,
     claimAirdrop,
     redeemPromoCode,
     buySkin,

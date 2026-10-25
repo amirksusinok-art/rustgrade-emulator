@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { UserProfile, AvatarId } from '../../types';
 import { soundManager } from '../../utils/soundManager';
-import { Volume2, VolumeX, ShieldCheck, Zap, User, ChevronUp, Bell, Plus, Flame, Package } from 'lucide-react';
+import { Volume2, VolumeX, ShieldCheck, Zap, User, ChevronUp, Bell, Plus, Flame, Package, Building2, Trophy } from 'lucide-react';
 import { ScrapIcon } from '../common/ScrapIcon';
 
 interface HeaderProps {
   profile: UserProfile;
   turboMode: boolean;
   mineCooldown?: number;
-  activeTab?: 'upgrade' | 'furnace' | 'cases';
-  onSelectTab?: (tab: 'upgrade' | 'furnace' | 'cases') => void;
+  activeTab?: 'upgrade' | 'furnace' | 'cases' | 'staking' | 'leaderboard';
+  onSelectTab?: (tab: 'upgrade' | 'furnace' | 'cases' | 'staking' | 'leaderboard') => void;
   onToggleTurbo: () => void;
   onOpenFairModal: () => void;
   onOpenProfile: () => void;
@@ -98,6 +98,33 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Package className={`w-3.5 h-3.5 ${activeTab === 'cases' ? 'text-[#2196F3]' : 'text-sky-500'}`} />
               <span>КЕЙСЫ</span>
+            </button>
+
+            <button
+              onClick={() => onSelectTab && onSelectTab('staking')}
+              className={`flex items-center gap-1.5 px-3 md:px-4 py-1.5 rounded-t text-xs font-black uppercase tracking-wider transition-all ${
+                activeTab === 'staking'
+                  ? 'bg-[#0F291E] border-t-2 border-[#10B981] text-white shadow-sm'
+                  : 'bg-transparent text-text-muted hover:text-white'
+              }`}
+            >
+              <Building2 className={`w-3.5 h-3.5 ${activeTab === 'staking' ? 'text-[#10B981]' : 'text-emerald-500'}`} />
+              <span>АРЕНДА</span>
+              {(profile.stakedItems?.length || 0) > 0 && (
+                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
+              )}
+            </button>
+
+            <button
+              onClick={() => onSelectTab && onSelectTab('leaderboard')}
+              className={`flex items-center gap-1.5 px-3 md:px-4 py-1.5 rounded-t text-xs font-black uppercase tracking-wider transition-all ${
+                activeTab === 'leaderboard'
+                  ? 'bg-[#2D240E] border-t-2 border-[#F59E0B] text-white shadow-sm'
+                  : 'bg-transparent text-text-muted hover:text-white'
+              }`}
+            >
+              <Trophy className={`w-3.5 h-3.5 ${activeTab === 'leaderboard' ? 'text-[#F59E0B]' : 'text-amber-500'}`} />
+              <span>РЕЙТИНГИ</span>
             </button>
           </nav>
         </div>

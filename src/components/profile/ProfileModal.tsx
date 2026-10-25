@@ -10,6 +10,7 @@ interface ProfileModalProps {
   onClose: () => void;
   onUpdateAvatar: (avatar: AvatarId) => void;
   onUpdateNickname: (nick: string) => void;
+  onUpdateSteamId?: (steamId: string) => void;
   onRedeemPromo: (code: string) => { success: boolean; message: string };
   onTriggerAirdrop?: () => void;
   onResetProgress: () => void;
@@ -29,6 +30,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   onClose,
   onUpdateAvatar,
   onUpdateNickname,
+  onUpdateSteamId,
   onRedeemPromo,
   onTriggerAirdrop,
   onResetProgress,
@@ -38,6 +40,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [promoFeedback, setPromoFeedback] = useState<{ text: string; isError: boolean } | null>(null);
   const [isEditingNick, setIsEditingNick] = useState<boolean>(false);
   const [nickInput, setNickInput] = useState<string>(profile.nickname);
+  const [isEditingSteamId, setIsEditingSteamId] = useState<boolean>(false);
+  const [steamIdInput, setSteamIdInput] = useState<string>(profile.steamId || profile.id);
 
   if (!isOpen) return null;
 
@@ -61,6 +65,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     if (nickInput.trim()) {
       onUpdateNickname(nickInput.trim());
       setIsEditingNick(false);
+    }
+  };
+
+  const handleSaveSteamId = () => {
+    if (steamIdInput.trim() && onUpdateSteamId) {
+      onUpdateSteamId(steamIdInput.trim());
+      setIsEditingSteamId(false);
     }
   };
 
@@ -115,11 +126,40 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               )}
             </div>
 
-            <div className="flex items-center gap-1.5 text-xs text-text-muted font-mono mt-0.5">
-              <span>ID: {profile.id} • Баланс:</span>
-              <ScrapIcon size="xs" />
-              <span className="font-rajdhani font-black text-white">{profile.balance.toFixed(2)}</span>
-              <span>Scrap</span>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 text-xs text-text-muted font-mono mt-1">
+              <div className="flex items-center gap-1.5">
+                <span>SteamID:</span>
+                {isEditingSteamId ? (
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="text"
+                      value={steamIdInput}
+                      onChange={(e) => setSteamIdInput(e.target.value)}
+                      className="px-2 py-0.5 rounded bg-[#0D0F12] border border-border-dark text-xs font-mono text-amber-300 focus:outline-none focus:border-amber-500"
+                      maxLength={24}
+                    />
+                    <button onClick={handleSaveSteamId} className="p-0.5 rounded bg-emerald-600 text-white">
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <span className="text-zinc-300 font-bold">{profile.steamId || profile.id}</span>
+                    <button
+                      onClick={() => setIsEditingSteamId(true)}
+                      className="text-[10px] text-text-muted hover:text-amber-400 transition-colors"
+                    >
+                      (изм)
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-1">
+                <span>• Баланс:</span>
+                <ScrapIcon size="xs" />
+                <span className="font-rajdhani font-black text-white">{profile.balance.toFixed(2)}</span>
+                <span>Scrap</span>
+              </div>
             </div>
 
             {/* Avatar Selector Pills */}
@@ -146,7 +186,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 my-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 my-5">
           <div className="p-3 rounded-xl bg-[#0D0F12] border border-border-dark text-center">
             <span className="text-[10px] uppercase font-bold text-text-muted block">
               АПГРЕЙДЫ
@@ -171,6 +211,24 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             </span>
             <span className="font-rajdhani font-black text-xl text-primary-red">
               {profile.stats.totalLosses}
+            </span>
+          </div>
+
+          <div className="p-3 rounded-xl bg-[#0D0F12] border border-border-dark text-center">
+            <span className="text-[10px] uppercase font-bold text-text-muted block">
+              ОТКРЫТО КЕЙСОВ
+            </span>
+            <span className="font-rajdhani font-black text-xl text-sky-400">
+              {profile.stats.totalCasesOpened || 0}
+            </span>
+          </div>
+
+          <div className="p-3 rounded-xl bg-[#0D0F12] border border-border-dark text-center">
+            <span className="text-[10px] uppercase font-bold text-text-muted block">
+              В АРЕНДЕ (ДОХОД)
+            </span>
+            <span className="font-rajdhani font-black text-xl text-emerald-400">
+              {profile.stakedItems?.length || 0} скинов
             </span>
           </div>
 

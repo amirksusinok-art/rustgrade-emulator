@@ -7,6 +7,8 @@ import { UserInventory } from './components/inventory/UserInventory';
 import { CatalogGrid } from './components/inventory/CatalogGrid';
 import { FurnaceTradeUp } from './components/furnace/FurnaceTradeUp';
 import { CasesView } from './components/cases/CasesView';
+import { StakingView } from './components/staking/StakingView';
+import { LeaderboardView } from './components/leaderboard/LeaderboardView';
 import { Footer } from './components/layout/Footer';
 
 // Modals
@@ -16,6 +18,7 @@ import { FairVerifierModal } from './components/provably-fair/FairVerifierModal'
 import { AirdropModal } from './components/effects/AirdropModal';
 import { AdminModal } from './components/admin/AdminModal';
 import { CaseRouletteModal } from './components/cases/CaseRouletteModal';
+import { WelcomeModal } from './components/auth/WelcomeModal';
 
 // Hooks & Data
 import { useUserStore } from './hooks/useUserStore';
@@ -45,6 +48,11 @@ export function App() {
     buySkin,
     updateAvatar,
     updateNickname,
+    updateProfileDetails,
+    stakeSkin,
+    unstakeSkin,
+    claimStakingYield,
+    recordCaseOpened,
     redeemPromoCode,
     resetProgress,
     setBalance,
@@ -52,8 +60,15 @@ export function App() {
     importProfile,
   } = useUserStore();
 
-  const [activeNavTab, setActiveNavTab] = useState<'upgrade' | 'furnace' | 'cases'>('upgrade');
+  const [activeNavTab, setActiveNavTab] = useState<'upgrade' | 'furnace' | 'cases' | 'staking' | 'leaderboard'>('upgrade');
   const [selectedCaseForModal, setSelectedCaseForModal] = useState<CaseDefinition | null>(null);
+  const [isWelcomeOpen, setIsWelcomeOpen] = useState<boolean>(() => {
+    try {
+      return !localStorage.getItem('rustgrade_onboarding_completed');
+    } catch {
+      return false;
+    }
+  });
 
   const {
     selectedItemIds,
@@ -249,6 +264,21 @@ export function App() {
                   userInventory={profile.inventory}
                   onSelectCase={(crate) => setSelectedCaseForModal(crate)}
                 />
+              ) : activeNavTab === 'staking' ? (
+                /* Skin Lending & Staking Vault */
+                <StakingView
+                  profile={profile}
+                  onStakeSkin={stakeSkin}
+                  onUnstakeSkin={unstakeSkin}
+                  onClaimYield={claimStakingYield}
+                  onInspectSkin={handleInspectSkinId}
+                />
+              ) : activeNavTab === 'leaderboard' ? (
+                /* Seasonal Leaderboard & Hall of Fame */
+                <LeaderboardView
+                  profile={profile}
+                  onInspectSkin={handleInspectSkinId}
+                />
               ) : (
                 /* Core Upgrade View */
                 <>
@@ -358,6 +388,7 @@ export function App() {
         onClose={() => setIsProfileOpen(false)}
         onUpdateAvatar={(av: AvatarId) => updateAvatar(av)}
         onUpdateNickname={(nick: string) => updateNickname(nick)}
+        onUpdateSteamId={(sid: string) => updateProfileDetails(profile.nickname, sid, profile.avatar)}
         onRedeemPromo={redeemPromoCode}
         onTriggerAirdrop={spawnAirdrop}
         onResetProgress={resetProgress}
@@ -393,7 +424,21 @@ export function App() {
         onDeductScrap={deductScrap}
         onAddScrap={addScrap}
         onAddSkin={addSkin}
+        onRecordCaseOpened={recordCaseOpened}
         onSendToUpgrader={handleSendCaseDropToUpgrader}
+      />
+
+      {/* Welcome / Onboarding Modal for Nickname and SteamID */}
+      <WelcomeModal
+        isOpen={isWelcomeOpen}
+        currentNickname={profile.nickname}
+        currentSteamId={profile.steamId}
+        currentAvatar={profile.avatar as AvatarId}
+        onComplete={(nick, sid, av) => {
+          updateProfileDetails(nick, sid, av);
+          addScrap(10);
+          setIsWelcomeOpen(false);
+        }}
       />
     </div>
   );

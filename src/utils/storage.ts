@@ -16,18 +16,23 @@ export function getDefaultProfile(): UserProfile {
   const randomSuffix = Math.floor(10000 + Math.random() * 90000);
   return {
     id: `RG_${randomSuffix}`,
+    steamId: `76561198${randomSuffix}`,
     nickname: 'RustSurfer',
     avatar: 'scientist',
     balance: 5.00,
     inventory: [],
+    stakedItems: [],
+    lastYieldClaimAt: Date.now(),
     stats: {
       totalUpgrades: 0,
       totalWins: 0,
       totalLosses: 0,
       totalScrapEarned: 0,
       totalAirdropsClaimed: 0,
+      totalCasesOpened: 0,
       bestDropChance: null,
       bestDropSkinId: null,
+      bestDropMultiplier: null,
     },
     usedPromoCodes: [],
   };
@@ -45,6 +50,15 @@ export function loadUserProfile(): UserProfile {
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed.inventory)) {
       parsed.inventory = [];
+    }
+    if (!Array.isArray(parsed.stakedItems)) {
+      parsed.stakedItems = [];
+    }
+    if (!parsed.lastYieldClaimAt) {
+      parsed.lastYieldClaimAt = Date.now();
+    }
+    if (!parsed.steamId) {
+      parsed.steamId = parsed.id;
     }
     // One-time cleanup of old hardcoded starter test skins
     if (!localStorage.getItem('rustgrade_starter_cleaned_v2')) {
