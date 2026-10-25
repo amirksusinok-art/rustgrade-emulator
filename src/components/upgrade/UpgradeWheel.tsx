@@ -113,9 +113,9 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
         }}
       />
 
-      {/* SVG Wheel Stage (320x320) - Без тряски! */}
+      {/* SVG Wheel Stage (320x320) */}
       <div className="relative w-[320px] h-[320px]">
-        {/* 1. COMPLETELY STATIC WHEEL PLATE (Диск стоит неподвижно строго как на фото 5) */}
+        {/* 1. COMPLETELY STATIC WHEEL PLATE (Диск стоит неподвижно) */}
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible">
           <defs>
             <linearGradient id="wheelMetal" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -127,6 +127,12 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
             <linearGradient id="sectorFill" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor={sectorColor} stopOpacity="0.95" />
               <stop offset="100%" stopColor={sectorColor} stopOpacity="0.80" />
+            </linearGradient>
+
+            <linearGradient id="pointerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#EF5350" />
+              <stop offset="50%" stopColor="#C62828" />
+              <stop offset="100%" stopColor="#8E0000" />
             </linearGradient>
           </defs>
 
@@ -210,36 +216,51 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
           ))}
         </svg>
 
-        {/* 2. ROTATING POINTER / ARROW LAYER - Плавное чистое вращение без дрожания */}
+        {/* Pointer Speed Motion Trail Glow (when spinning at high speed) */}
+        {isSpinning && (
+          <div
+            className="absolute inset-0 pointer-events-none z-10"
+            style={{
+              transform: `rotate(${rotation - 8}deg)`,
+              transition: `transform ${turboMode ? 0.8 : 3.5}s cubic-bezier(0.14, 0.94, 0.22, 1)`,
+            }}
+          >
+            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-8 h-8 bg-red-600/35 blur-md rounded-full" />
+          </div>
+        )}
+
+        {/* 2. ROTATING POINTER / ARROW LAYER - Идеально плавное физическое вращение без тряски */}
         <div
           className="absolute inset-0 pointer-events-none z-20"
           style={{
             transform: `rotate(${rotation}deg)`,
             transition: isSpinning
-              ? `transform ${turboMode ? 0.8 : 3.5}s cubic-bezier(0.12, 0.8, 0.33, 1)`
+              ? `transform ${turboMode ? 0.8 : 3.5}s cubic-bezier(0.14, 0.94, 0.22, 1)`
               : 'none',
           }}
         >
-          {/* Arrow Pointer positioned at the outer top perimeter, pointing toward the center */}
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex flex-col items-center filter drop-shadow-[0_4px_12px_rgba(229,57,53,0.85)]">
-            <svg width="26" height="30" viewBox="0 0 26 30">
+          {/* Detailed Pointer Arrow with Metallic Bevel & Pivot Pin */}
+          <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 flex flex-col items-center filter drop-shadow-[0_4px_14px_rgba(229,57,53,0.9)]">
+            <svg width="28" height="32" viewBox="0 0 28 32">
               {/* Rustgrade Arrow Triangle */}
               <polygon
-                points="13,28 1,4 25,4"
-                fill="#E53935"
+                points="14,30 2,4 26,4"
+                fill="url(#pointerGrad)"
                 stroke="#FFFFFF"
                 strokeWidth="2"
                 strokeLinejoin="round"
               />
               {/* Internal white chevron emblem */}
               <polyline
-                points="8,10 13,16 18,10"
+                points="9,11 14,17 19,11"
                 fill="none"
                 stroke="#FFFFFF"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
+              {/* Chrome Pivot Pin */}
+              <circle cx="14" cy="5" r="2.2" fill="#CFD8DC" stroke="#263238" strokeWidth="0.8" />
             </svg>
           </div>
         </div>

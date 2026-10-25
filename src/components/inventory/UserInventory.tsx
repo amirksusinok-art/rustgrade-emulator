@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { InventoryItem, SkinDefinition } from '../../types';
 import { SKINS_DATA, SKINS_MAP } from '../../data/skinsData';
 import { ItemCard } from './ItemCard';
-import { ShoppingCart, ArrowUpDown, Trash2, Search, X } from 'lucide-react';
+import { ShoppingCart, ArrowUpDown, Trash2, Search, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ScrapIcon } from '../common/ScrapIcon';
 
 interface UserInventoryProps {
@@ -33,6 +33,8 @@ export const UserInventory: React.FC<UserInventoryProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 12;
 
   // Total inventory value
   const totalInvValue = useMemo(() => {
@@ -66,7 +68,7 @@ export const UserInventory: React.FC<UserInventoryProps> = ({
   const displayShopSkins = useMemo(() => {
     return SKINS_DATA
       .filter((skin) => {
-        if (searchQuery && !skin.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+        if (searchQuery && !skin.name.toLowerCase().includes(searchQuery.toLowerCase()) && !skin.type.toLowerCase().includes(searchQuery.toLowerCase())) return false;
         const min = parseFloat(minPrice);
         if (!isNaN(min) && skin.price < min) return false;
         const max = parseFloat(maxPrice);
@@ -78,6 +80,20 @@ export const UserInventory: React.FC<UserInventoryProps> = ({
       });
   }, [searchQuery, minPrice, maxPrice, sortOrder]);
 
+  // Pagination calculation based on active tab
+  const currentItemsCount = activeTab === 'inventory' ? displayInventory.length : displayShopSkins.length;
+  const totalPages = Math.max(1, Math.ceil(currentItemsCount / itemsPerPage));
+
+  const paginatedInventory = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return displayInventory.slice(start, start + itemsPerPage);
+  }, [displayInventory, currentPage, itemsPerPage]);
+
+  const paginatedShopSkins = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return displayShopSkins.slice(start, start + itemsPerPage);
+  }, [displayShopSkins, currentPage, itemsPerPage]);
+
   return (
     <div className="w-full bg-[#12141A]/95 border border-[#232731] rounded-lg p-3 flex flex-col justify-between h-full shadow-2xl">
       {/* Top Header strictly matching Photo 5 */}
@@ -86,7 +102,10 @@ export const UserInventory: React.FC<UserInventoryProps> = ({
         <div className="flex items-center gap-2">
           {/* Tab 1: Inventory (Red button with AK rifle icon) */}
           <button
-            onClick={() => setActiveTab('inventory')}
+            onClick={() => {
+              setActiveTab('inventory');
+              setCurrentPage(1);
+            }}
             className={`
               w-7 h-7 rounded flex items-center justify-center transition-all
               ${
@@ -104,7 +123,10 @@ export const UserInventory: React.FC<UserInventoryProps> = ({
 
           {/* Tab 2: Shop (Cart icon) */}
           <button
-            onClick={() => setActiveTab('shop')}
+            onClick={() => {
+              setActiveTab('shop');
+              setCurrentPage(1);
+            }}
             className={`
               w-7 h-7 rounded flex items-center justify-center transition-all
               ${
@@ -131,6 +153,53 @@ export const UserInventory: React.FC<UserInventoryProps> = ({
           >
             <ArrowUpDown className="w-3.5 h-3.5" />
           </button>
+        </div>
+
+        {/* Filters: MIN, MAX, Search */}
+        <div className="flex items-center gap-1.5">
+          <input
+            type="number"
+            value={minPrice}
+            onChange={(e) => {
+              setMinPrice(e.target.value);
+              setCurrentPage(1);
+            }}
+            placeholder="MIN"
+            className="w-12 px-1.5 py-0.5 rounded bg-[#0D0F12] border border-[#232731] text-[11px] font-rajdhani text-white placeholder-text-muted focus:outline-none focus:border-primary-red"
+          />
+
+          <input
+            type="number"
+            value={maxPrice}
+            onChange={(e) => {
+              setMaxPrice(e.target.value);
+              setCurrentPage(1);
+            }}
+            placeholder="MAX"
+            className="w-12 px-1.5 py-0.5 rounded bg-[#0D0F12] border border-[#232731] text-[11px] font-rajdhani text-white placeholder-text-muted focus:outline-none focus:border-primary-red"
+          />
+
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Поиск..."
+              className="w-20 sm:w-24 pl-5 pr-2 py-0.5 rounded bg-[#0D0F12] border border-[#232731] text-[11px] text-white placeholder-text-muted focus:outline-none focus:border-primary-red"
+            />
+            <Search className="w-2.5 h-2.5 text-text-muted absolute left-1.5 top-1/2 -translate-y-1/2" />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-1 top-1/2 -translate-y-1/2 text-text-muted hover:text-white"
+              >
+                <X className="w-2 h-2" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Right Info: ВСЕГО СКИНОВ ⚙ 0.00 (Фото 5) */}
@@ -178,7 +247,10 @@ export const UserInventory: React.FC<UserInventoryProps> = ({
                 Купите скины во вкладке с корзиной за Scrap или добудьте Scrap кнопкой «ПОПОЛНИТЬ» в шапке!
               </p>
               <button
-                onClick={() => setActiveTab('shop')}
+                onClick={() => {
+                  setActiveTab('shop');
+                  setCurrentPage(1);
+                }}
                 className="mt-3 px-3.5 py-1.5 rounded bg-[#C62828] hover:bg-[#D32F2F] text-white text-xs font-black uppercase tracking-wider transition-colors shadow"
               >
                 Купить скины в магазине
@@ -186,7 +258,7 @@ export const UserInventory: React.FC<UserInventoryProps> = ({
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-              {displayInventory.map((item) => {
+              {paginatedInventory.map((item) => {
                 const skin = SKINS_MAP[item.skinId];
                 if (!skin) return null;
                 const isSelected = selectedItemIds.includes(item.instanceId);
@@ -208,19 +280,56 @@ export const UserInventory: React.FC<UserInventoryProps> = ({
           )
         ) : (
           /* Shop Items (Фото 2) */
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-            {displayShopSkins.map((skin) => (
-              <ItemCard
-                key={skin.id}
-                skin={skin}
-                isShopItem={true}
-                onBuy={() => onBuySkin(skin.id)}
-                onInspect={() => onInspectSkin(skin.id)}
-                compact={true}
-              />
-            ))}
-          </div>
+          paginatedShopSkins.length === 0 ? (
+            <div className="h-full min-h-[300px] flex flex-col items-center justify-center text-center p-6 text-text-muted">
+              <span className="text-xs font-bold uppercase text-white">
+                Скины не найдены
+              </span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              {paginatedShopSkins.map((skin) => (
+                <ItemCard
+                  key={skin.id}
+                  skin={skin}
+                  isShopItem={true}
+                  onBuy={() => onBuySkin(skin.id)}
+                  onInspect={() => onInspectSkin(skin.id)}
+                  compact={true}
+                />
+              ))}
+            </div>
+          )
         )}
+      </div>
+
+      {/* Pagination Bar */}
+      <div className="pt-2 border-t border-[#232731] flex items-center justify-between text-xs text-text-muted">
+        <span>
+          Страница {currentPage} из {totalPages} ({currentItemsCount} скинов)
+        </span>
+
+        <div className="flex items-center gap-1.5">
+          <button
+            disabled={currentPage <= 1}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            className="p-1 rounded bg-[#1C1F26] hover:bg-[#2A2E38] text-text-muted hover:text-white disabled:opacity-30 transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+
+          <span className="font-rajdhani font-bold px-1.5 text-white">
+            {currentPage}
+          </span>
+
+          <button
+            disabled={currentPage >= totalPages}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            className="p-1 rounded bg-[#1C1F26] hover:bg-[#2A2E38] text-text-muted hover:text-white disabled:opacity-30 transition-colors"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
