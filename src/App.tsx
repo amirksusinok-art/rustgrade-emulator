@@ -95,18 +95,6 @@ export function App() {
   const [isFairModalOpen, setIsFairModalOpen] = useState<boolean>(false);
   const [isAdminOpen, setIsAdminOpen] = useState<boolean>(false);
 
-  // F1 Shortcut for Admin Console
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'F1') {
-        e.preventDefault();
-        setIsAdminOpen((prev) => !prev);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
   // Particles for Mining Scrap
   const [particles, setParticles] = useState<ClickParticle[]>([]);
 
@@ -350,6 +338,7 @@ export function App() {
         onRedeemPromo={redeemPromoCode}
         onTriggerAirdrop={spawnAirdrop}
         onResetProgress={resetProgress}
+        onOpenAdmin={() => setIsAdminOpen(true)}
       />
 
       {/* Provably Fair Verifier Modal */}

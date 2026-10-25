@@ -21,7 +21,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
               <button
                 onClick={onOpenAdmin}
                 className="p-1 rounded bg-[#1A1D24] hover:bg-[#252934] border border-[#232731] text-zinc-500 hover:text-[#E53935] transition-all ml-1 group"
-                title="F1 Dev Console (Режим Администратора)"
+                title="Панель Администратора"
               >
                 <Terminal className="w-3.5 h-3.5" />
               </button>

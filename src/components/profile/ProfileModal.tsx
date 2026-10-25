@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { UserProfile, AvatarId } from '../../types';
 import { SKINS_MAP } from '../../data/skinsData';
-import { X, Trophy, Gift, RotateCcw, Check, Award } from 'lucide-react';
+import { X, Trophy, Gift, RotateCcw, Check, Award, Terminal } from 'lucide-react';
 import { ScrapIcon } from '../common/ScrapIcon';
 
 interface ProfileModalProps {
@@ -13,6 +13,7 @@ interface ProfileModalProps {
   onRedeemPromo: (code: string) => { success: boolean; message: string };
   onTriggerAirdrop?: () => void;
   onResetProgress: () => void;
+  onOpenAdmin?: () => void;
 }
 
 const AVATARS: { id: AvatarId; label: string; icon: string }[] = [
@@ -31,6 +32,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   onRedeemPromo,
   onTriggerAirdrop,
   onResetProgress,
+  onOpenAdmin,
 }) => {
   const [promoInput, setPromoInput] = useState<string>('');
   const [promoFeedback, setPromoFeedback] = useState<{ text: string; isError: boolean } | null>(null);
@@ -265,8 +267,22 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           </p>
         </form>
 
-        {/* Action Buttons: Reset Progress */}
-        <div className="flex items-center justify-end pt-4 border-t border-border-dark/60">
+        {/* Action Buttons: Admin Panel & Reset Progress */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-border-dark/60">
+          {onOpenAdmin ? (
+            <button
+              onClick={() => {
+                onClose();
+                onOpenAdmin();
+              }}
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#1E222B] hover:bg-[#E53935]/20 text-zinc-300 hover:text-white border border-zinc-700 hover:border-[#E53935]/50 text-xs font-bold uppercase tracking-wider transition-all shadow-sm"
+              title="Открыть консоль администратора"
+            >
+              <Terminal className="w-3.5 h-3.5 text-[#E53935]" />
+              <span>Панель Администратора</span>
+            </button>
+          ) : <div />}
+
           <button
             onClick={() => {
               if (window.confirm('Вы уверены, что хотите сбросить прогресс? Баланс вернется к 5.00 Scrap.')) {

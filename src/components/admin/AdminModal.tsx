@@ -258,14 +258,14 @@ export const AdminModal: React.FC<AdminModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-rajdhani font-black text-lg text-white tracking-wider">
-                  F1 RUST DEV CONSOLE
+                  RUSTGRADE ADMIN CONSOLE
                 </span>
                 <span className="px-1.5 py-0.5 rounded bg-[#E53935]/20 text-[#E53935] text-[10px] font-bold tracking-widest uppercase border border-[#E53935]/40">
                   ADMIN MODE
                 </span>
               </div>
               <span className="text-[11px] text-zinc-400 font-mono">
-                Панель управления и отладки • Горячая клавиша: F1
+                Панель администратора и отладки • Доступ через профиль
               </span>
             </div>
           </div>
