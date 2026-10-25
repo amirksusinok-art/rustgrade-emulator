@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Crosshair, Sliders, Minus, Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 interface MultipliersProps {
   currentChance: number;
@@ -14,162 +13,114 @@ export const Multipliers: React.FC<MultipliersProps> = ({
   onApplyChance,
   disabled = false,
 }) => {
-  const [customInput, setCustomInput] = useState<string>(
-    currentChance > 0 ? currentChance.toFixed(2) : '50.00'
-  );
+  const [sliderChance, setSliderChance] = useState<number>(currentChance > 0 ? currentChance : 50);
 
-  const handleApplyCustom = (mode: 'auto' | 'skin' | 'slider') => {
-    const val = parseFloat(customInput);
-    if (!isNaN(val) && val >= 1.0 && val <= 79.99) {
-      onApplyChance(val, mode);
+  useEffect(() => {
+    if (currentChance > 0 && !disabled) {
+      setSliderChance(currentChance);
     }
-  };
+  }, [currentChance, disabled]);
 
-  const adjustCustom = (delta: number) => {
-    const current = parseFloat(customInput) || 50;
-    const next = Math.min(79.99, Math.max(1.0, current + delta));
-    const formatted = next.toFixed(2);
-    setCustomInput(formatted);
-    onApplyChance(next, 'auto');
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value);
+    setSliderChance(val);
+    onApplyChance(val, 'auto');
   };
 
   return (
-    <div className="w-full flex flex-col items-center gap-2.5 my-2">
-      {/* Row 1: Multipliers & Preset Chances */}
-      <div className="w-full flex flex-wrap items-center justify-center gap-2">
-        {/* Multipliers X2, X4, X8 */}
-        <div className="flex items-center gap-1 bg-surface-card border border-border-dark p-1 rounded-xl">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted px-1.5">
-            X:
-          </span>
-          {([2, 4, 8] as const).map((m) => (
-            <button
-              key={m}
-              type="button"
-              disabled={disabled}
-              onClick={() => onApplyMultiplier(m)}
-              className="px-2.5 py-1 rounded-lg bg-[#1B202A] hover:bg-[#262B37] text-white font-rajdhani font-bold text-xs md:text-sm tracking-wide border border-border-dark/60 hover:border-text-secondary/40 transition-all active:scale-95 disabled:opacity-40"
-            >
-              X{m}
-            </button>
-          ))}
-        </div>
+    <div className="w-full flex flex-col items-center gap-2 select-none">
+      {/* 1. Multipliers & Chances Row strictly matching Photo 5 */}
+      {/* Photo 5 shows: X2   X4   X8   35%   55%   75% in a single clean row */}
+      <div className="w-full grid grid-cols-6 gap-1.5 bg-[#12151B] border border-[#232731] p-1.5 rounded-lg">
+        {/* X2 */}
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => onApplyMultiplier(2)}
+          className="py-1.5 rounded bg-[#1B202A] hover:bg-[#252B38] text-white font-rajdhani font-black text-xs md:text-sm tracking-wider border border-[#2B313E] transition-all active:scale-95 disabled:opacity-40"
+        >
+          X2
+        </button>
 
-        {/* Preset Chances */}
-        <div className="flex items-center gap-1 bg-surface-card border border-border-dark p-1 rounded-xl">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted px-1.5">
-            ШАНСЫ:
-          </span>
+        {/* X4 */}
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => onApplyMultiplier(4)}
+          className="py-1.5 rounded bg-[#1B202A] hover:bg-[#252B38] text-white font-rajdhani font-black text-xs md:text-sm tracking-wider border border-[#2B313E] transition-all active:scale-95 disabled:opacity-40"
+        >
+          X4
+        </button>
 
-          {[
-            { pct: 10, color: 'bg-red-500' },
-            { pct: 25, color: 'bg-red-400' },
-            { pct: 35, color: 'bg-primary-red' },
-            { pct: 50, color: 'bg-warning-orange' },
-            { pct: 55, color: 'bg-yellow-400' },
-            { pct: 75, color: 'bg-success-green' },
-          ].map(({ pct, color }) => (
-            <button
-              key={pct}
-              type="button"
-              disabled={disabled}
-              onClick={() => {
-                setCustomInput(pct.toFixed(2));
-                onApplyChance(pct, 'auto');
-              }}
-              className="relative px-2 md:px-2.5 py-1 rounded-lg bg-[#1B202A] hover:bg-white/5 text-white font-rajdhani font-bold text-xs md:text-sm tracking-wide border border-border-dark/60 transition-all active:scale-95 disabled:opacity-40 group overflow-hidden"
-            >
-              <span>{pct}%</span>
-              <div
-                className={`absolute bottom-0 left-0 right-0 h-[2px] ${color} group-hover:h-[3px] transition-all`}
-              />
-            </button>
-          ))}
-        </div>
+        {/* X8 */}
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => onApplyMultiplier(8)}
+          className="py-1.5 rounded bg-[#1B202A] hover:bg-[#252B38] text-white font-rajdhani font-black text-xs md:text-sm tracking-wider border border-[#2B313E] transition-all active:scale-95 disabled:opacity-40"
+        >
+          X8
+        </button>
+
+        {/* 35% */}
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => onApplyChance(35, 'auto')}
+          className="py-1.5 rounded bg-[#1B202A] hover:bg-[#252B38] text-white font-rajdhani font-black text-xs md:text-sm tracking-wider border border-[#2B313E] transition-all active:scale-95 disabled:opacity-40"
+        >
+          35%
+        </button>
+
+        {/* 55% */}
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => onApplyChance(55, 'auto')}
+          className="py-1.5 rounded bg-[#1B202A] hover:bg-[#252B38] text-white font-rajdhani font-black text-xs md:text-sm tracking-wider border border-[#2B313E] transition-all active:scale-95 disabled:opacity-40"
+        >
+          55%
+        </button>
+
+        {/* 75% */}
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => onApplyChance(75, 'auto')}
+          className="py-1.5 rounded bg-[#1B202A] hover:bg-[#252B38] text-white font-rajdhani font-black text-xs md:text-sm tracking-wider border border-[#2B313E] transition-all active:scale-95 disabled:opacity-40"
+        >
+          75%
+        </button>
       </div>
 
-      {/* Row 2: Custom Chance Input & Fine-Tuning */}
-      <div className="w-full max-w-lg bg-surface-card border border-border-dark/80 rounded-2xl p-2.5 flex flex-wrap items-center justify-between gap-2 shadow-inner">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
-            СВОЙ ШАНС:
+      {/* 2. Interactive Chance Slider (1.00% .. 95.00%) as requested */}
+      <div className="w-full bg-[#12151B] border border-[#232731] rounded-lg p-2 flex flex-col gap-1.5">
+        <div className="flex items-center justify-between text-[11px] font-bold">
+          <span className="text-text-muted uppercase tracking-wider">
+            ПОЛЗУНОК ШАНСА:
           </span>
-
-          {/* Minus button */}
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => adjustCustom(-1)}
-            className="p-1 rounded-lg bg-[#1B202A] hover:bg-[#262B37] text-text-secondary hover:text-white border border-border-dark transition-colors disabled:opacity-40"
-            title="-1%"
-          >
-            <Minus className="w-3 h-3" />
-          </button>
-
-          {/* Number Input */}
-          <div className="relative flex items-center">
-            <input
-              type="number"
-              min="1.00"
-              max="79.99"
-              step="0.5"
-              disabled={disabled}
-              value={customInput}
-              onChange={(e) => setCustomInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleApplyCustom('auto');
-                }
-              }}
-              className="w-16 px-1.5 py-1 rounded-lg bg-[#0D0F12] border border-border-dark focus:border-primary-red focus:outline-none text-white font-rajdhani font-bold text-sm text-center"
-            />
-            <span className="text-xs text-text-muted font-rajdhani font-bold ml-1">%</span>
-          </div>
-
-          {/* Plus button */}
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => adjustCustom(1)}
-            className="p-1 rounded-lg bg-[#1B202A] hover:bg-[#262B37] text-text-secondary hover:text-white border border-border-dark transition-colors disabled:opacity-40"
-            title="+1%"
-          >
-            <Plus className="w-3 h-3" />
-          </button>
+          <span className="font-rajdhani font-black text-sm text-[#FFD54F]">
+            {sliderChance.toFixed(2)}%
+          </span>
         </div>
 
-        {/* Dual Actions: Match Skin vs Match Scrap */}
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
+        <div className="relative flex items-center">
+          <input
+            type="range"
+            min="1.00"
+            max="95.00"
+            step="0.5"
             disabled={disabled}
-            onClick={() => handleApplyCustom('skin')}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#1B202A] hover:bg-[#262B37] text-text-secondary hover:text-white border border-border-dark text-[11px] font-bold uppercase tracking-wider transition-all disabled:opacity-40"
-            title="Найти подходящий скин в каталоге под этот шанс"
-          >
-            <Crosshair className="w-3 h-3 text-primary-red" />
-            <span>Скин</span>
-          </button>
+            value={sliderChance}
+            onChange={handleSliderChange}
+            className="w-full h-1.5 bg-[#0A0C0F] rounded-lg appearance-none cursor-pointer accent-[#E53935] disabled:cursor-not-allowed"
+          />
+        </div>
 
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => handleApplyCustom('slider')}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#1B202A] hover:bg-[#262B37] text-text-secondary hover:text-white border border-border-dark text-[11px] font-bold uppercase tracking-wider transition-all disabled:opacity-40"
-            title="Рассчитать и выставить Scrap на слайдере под этот шанс"
-          >
-            <Sliders className="w-3 h-3 text-success-green" />
-            <span>Scrap</span>
-          </button>
-
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => handleApplyCustom('auto')}
-            className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-primary-red to-[#C62828] hover:from-primary-red-hover hover:to-primary-red text-white text-[11px] font-bold uppercase tracking-wider transition-all shadow-sm disabled:opacity-40"
-          >
-            ОК
-          </button>
+        <div className="flex items-center justify-between text-[9px] font-rajdhani font-bold text-text-muted px-0.5">
+          <span>1.00%</span>
+          <span>50.00%</span>
+          <span>95.00%</span>
         </div>
       </div>
     </div>

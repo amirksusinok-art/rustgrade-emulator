@@ -22,13 +22,13 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   // Combine real user round history with authentic default history
   const defaultHistory: SidebarItem[] = React.useMemo(() => {
     return [
-      { id: 'def_1', skinId: 'neon_dragon_garage_door', chance: 24.23, isWin: true },
-      { id: 'def_2', skinId: 'camo_netting', chance: 58.24, isWin: true },
-      { id: 'def_3', skinId: 'plate_carrier___black', chance: 57.48, isWin: true },
-      { id: 'def_4', skinId: 'christmas_lights', chance: 77.71, isWin: true },
-      { id: 'def_5', skinId: 'crime_bag', chance: 37.28, isWin: true },
-      { id: 'def_6', skinId: 'stainless_facemask', chance: 65.66, isWin: true },
-      { id: 'def_7', skinId: 'forest_raiders_roadsign_pants', chance: 76.96, isWin: true },
+      { id: 'def_1', skinId: 'neon_dragon_garage_door', chance: 24.33, isWin: true },
+      { id: 'def_2', skinId: 'camo_netting', chance: 70.04, isWin: true },
+      { id: 'def_3', skinId: 'plate_carrier___black', chance: 27.82, isWin: true },
+      { id: 'def_4', skinId: 'christmas_lights', chance: 75.03, isWin: true },
+      { id: 'def_5', skinId: 'crime_bag', chance: 70.59, isWin: true },
+      { id: 'def_6', skinId: 'stainless_facemask', chance: 27.33, isWin: true },
+      { id: 'def_7', skinId: 'forest_raiders_roadsign_pants', chance: 70.55, isWin: true },
       { id: 'def_8', skinId: 'glory_ak47', chance: 18.42, isWin: true },
     ];
   }, []);
@@ -62,7 +62,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
           <span className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] animate-pulse" />
           <span className="text-text-muted uppercase">ОНЛАЙН:</span>
           <span className="text-white font-rajdhani text-[11px] font-extrabold ml-auto">
-            1 013
+            1 006
           </span>
         </div>
 
@@ -70,7 +70,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
           <Flame className="w-2.5 h-2.5 text-primary-red" />
           <span className="text-text-muted uppercase">АПГРЕЙДОВ:</span>
           <span className="text-white font-rajdhani text-[11px] font-extrabold ml-auto">
-            42.8M
+            42 815 958
           </span>
         </div>
       </div>

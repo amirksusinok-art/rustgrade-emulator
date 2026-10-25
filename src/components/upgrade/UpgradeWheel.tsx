@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Edit2, Check, X } from 'lucide-react';
+import { Edit2, Check, X, CheckCircle, XCircle } from 'lucide-react';
+import { SkinDefinition } from '../../types';
 
 interface UpgradeWheelProps {
   winProbability: number;
@@ -11,6 +12,8 @@ interface UpgradeWheelProps {
     color: string;
     bg: string;
   };
+  wheelOutcome?: 'idle' | 'win' | 'lose';
+  outcomeSkin?: SkinDefinition | null;
   onSetCustomChance?: (chance: number) => void;
 }
 
@@ -20,6 +23,8 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
   isSpinning,
   turboMode,
   safetyStatus,
+  wheelOutcome = 'idle',
+  outcomeSkin = null,
   onSetCustomChance,
 }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -85,7 +90,7 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
   const handleSaveCustom = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const parsed = parseFloat(editValue);
-    if (!isNaN(parsed) && parsed >= 1.0 && parsed <= 79.99 && onSetCustomChance) {
+    if (!isNaN(parsed) && parsed >= 1.0 && parsed <= 95.0 && onSetCustomChance) {
       onSetCustomChance(parsed);
     }
     setIsEditing(false);
@@ -95,16 +100,21 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
     <div className="relative flex items-center justify-center select-none my-2">
       {/* Outer Glow Halo */}
       <div
-        className="absolute w-72 h-72 rounded-full pointer-events-none transition-colors duration-500"
+        className="absolute w-72 h-72 rounded-full pointer-events-none transition-all duration-500"
         style={{
-          boxShadow: `0 0 45px ${sectorGlow}`,
+          boxShadow:
+            wheelOutcome === 'win'
+              ? '0 0 60px rgba(76, 175, 80, 0.7)'
+              : wheelOutcome === 'lose'
+              ? '0 0 60px rgba(229, 57, 53, 0.7)'
+              : `0 0 45px ${sectorGlow}`,
           opacity: isSpinning ? 0.9 : 0.4,
         }}
       />
 
       {/* SVG Wheel Stage (320x320) */}
-      <div className="relative w-[320px] h-[320px]">
-        {/* 1. COMPLETELY STATIC WHEEL PLATE (Фото 4: колесо стоит на месте, не крутится) */}
+      <div className={`relative w-[320px] h-[320px] ${wheelOutcome === 'lose' ? 'animate-shake' : ''}`}>
+        {/* 1. COMPLETELY STATIC WHEEL PLATE (Фото 5: колесо стоит на месте, не крутится) */}
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible">
           <defs>
             <linearGradient id="wheelMetal" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -199,7 +209,7 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
           ))}
         </svg>
 
-        {/* 2. ROTATING POINTER / ARROW LAYER (Крутится только стрелка вокруг колеса!) */}
+        {/* 2. ROTATING POINTER / ARROW LAYER (Крутится только стрелка вокруг колеса) */}
         <div
           className="absolute inset-0 pointer-events-none z-20"
           style={{
@@ -233,80 +243,130 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
           </div>
         </div>
 
-        {/* 3. STATIC CENTER HUB (Никогда не крутится, текст всегда строго вертикален) */}
+        {/* 3. CENTER HUB WITH IN-WHEEL WIN / LOSS OUTCOME PRESENTATION */}
+        {/* If Won: Shows the item on the wheel with glowing aura and confetti */}
+        {/* If Lost: Shows defeat pulse on the wheel */}
+        {/* If Idle: Shows standard percentage and safety status matching Photo 5 */}
         <div
-          className="absolute inset-0 m-auto w-[184px] h-[184px] rounded-full bg-gradient-to-b from-[#1C2029] via-[#12151B] to-[#0A0C0F] border-4 border-[#242934] shadow-[inset_0_4px_16px_rgba(0,0,0,0.9)] flex flex-col items-center justify-center z-10"
+          className={`
+            absolute inset-0 m-auto w-[184px] h-[184px] rounded-full
+            flex flex-col items-center justify-center z-10 transition-all duration-300
+            ${
+              wheelOutcome === 'win'
+                ? 'bg-gradient-to-b from-[#1C2C1D] via-[#121E14] to-[#0A120B] border-4 border-[#4CAF50] shadow-[0_0_30px_rgba(76,175,80,0.6)]'
+                : wheelOutcome === 'lose'
+                ? 'bg-gradient-to-b from-[#2E1214] via-[#1F0B0C] to-[#0D0506] border-4 border-[#E53935] shadow-[0_0_30px_rgba(229,57,53,0.6)]'
+                : 'bg-gradient-to-b from-[#1C2029] via-[#12151B] to-[#0A0C0F] border-4 border-[#242934] shadow-[inset_0_4px_16px_rgba(0,0,0,0.9)]'
+            }
+          `}
         >
-          {/* Subtle metal crosshair */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-            <div className="w-full h-[1px] bg-white" />
-            <div className="h-full w-[1px] bg-white absolute" />
-          </div>
-
-          <span className="text-[10px] tracking-widest uppercase font-bold text-text-muted mb-0.5">
-            ШАНС
-          </span>
-
-          {isEditing ? (
-            <form onSubmit={handleSaveCustom} className="flex flex-col items-center z-20">
-              <div className="flex items-center gap-1">
-                <input
-                  type="number"
-                  min="1"
-                  max="79.99"
-                  step="0.1"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  className="w-20 px-1 py-0.5 rounded bg-[#0D0F12] border border-primary-red text-center font-rajdhani font-black text-2xl text-white focus:outline-none"
-                  autoFocus
-                />
-                <span className="text-xl font-rajdhani font-bold text-text-secondary">%</span>
+          {wheelOutcome === 'win' && outcomeSkin ? (
+            /* IN-WHEEL WIN DISPLAY */
+            <div className="flex flex-col items-center text-center px-2 animate-fade-in">
+              <div className="flex items-center gap-1 text-success-green font-black text-xs uppercase tracking-wider mb-0.5">
+                <CheckCircle className="w-3.5 h-3.5" />
+                <span>ВЫИГРЫШ!</span>
               </div>
-              <div className="flex items-center gap-2 mt-1">
-                <button
-                  type="submit"
-                  className="p-1 rounded bg-success-green hover:bg-success-green-hover text-white text-xs"
-                >
-                  <Check className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsEditing(false)}
-                  className="p-1 rounded bg-zinc-700 text-white text-xs"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div
-              onClick={() => {
-                if (!isSpinning && onSetCustomChance) {
-                  setEditValue(winProbability.toFixed(2));
-                  setIsEditing(true);
-                }
-              }}
-              className={`flex items-center gap-1 group ${!isSpinning && onSetCustomChance ? 'cursor-pointer hover:scale-105' : ''} transition-transform`}
-              title="Кликните, чтобы задать свой шанс"
-            >
-              <span className="font-rajdhani font-black text-4xl text-white tracking-tight drop-shadow-md">
-                {winProbability.toFixed(2)}
-                <span className="text-2xl text-text-secondary ml-0.5">%</span>
+              <img
+                src={`/images/skins/${outcomeSkin.localFile}`}
+                alt={outcomeSkin.name}
+                className="max-h-16 object-contain my-0.5 filter drop-shadow-[0_4px_12px_rgba(76,175,80,0.5)] animate-bounce"
+              />
+              <span className="text-[10px] font-bold text-white uppercase truncate max-w-[150px]">
+                {outcomeSkin.name}
               </span>
-              {!isSpinning && onSetCustomChance && (
-                <Edit2 className="w-3 h-3 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
-              )}
+              <span className="text-[11px] font-rajdhani font-black text-[#FFD54F]">
+                + ⚙️ {outcomeSkin.price.toFixed(2)}
+              </span>
             </div>
-          )}
+          ) : wheelOutcome === 'lose' ? (
+            /* IN-WHEEL LOSS DISPLAY */
+            <div className="flex flex-col items-center text-center px-2 animate-fade-in">
+              <div className="w-10 h-10 rounded-full bg-red-600/20 border-2 border-primary-red flex items-center justify-center text-primary-red mb-1">
+                <XCircle className="w-6 h-6" />
+              </div>
+              <span className="font-rajdhani font-black text-lg text-primary-red uppercase tracking-wider">
+                НЕУДАЧА
+              </span>
+              <span className="text-[9px] font-bold text-text-muted uppercase">
+                ПРЕДМЕТ УТЕРЯН
+              </span>
+            </div>
+          ) : (
+            /* STANDARD IN-WHEEL PERCENTAGE (Фото 5) */
+            <>
+              {/* Subtle metal crosshair */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
+                <div className="w-full h-[1px] bg-white" />
+                <div className="h-full w-[1px] bg-white absolute" />
+              </div>
 
-          <div
-            className={`
-              mt-1.5 px-3 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase border
-              ${safetyStatus.color} ${safetyStatus.bg} border-current/30 shadow-sm
-            `}
-          >
-            {safetyStatus.label}
-          </div>
+              {isEditing ? (
+                <form onSubmit={handleSaveCustom} className="flex flex-col items-center z-20">
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      min="1"
+                      max="95.00"
+                      step="0.1"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      className="w-20 px-1 py-0.5 rounded bg-[#0D0F12] border border-primary-red text-center font-rajdhani font-black text-2xl text-white focus:outline-none"
+                      autoFocus
+                    />
+                    <span className="text-xl font-rajdhani font-bold text-text-secondary">%</span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <button
+                      type="submit"
+                      className="p-1 rounded bg-success-green hover:bg-success-green-hover text-white text-xs"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditing(false)}
+                      className="p-1 rounded bg-zinc-700 text-white text-xs"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div
+                  onClick={() => {
+                    if (!isSpinning && onSetCustomChance) {
+                      setEditValue(winProbability.toFixed(2));
+                      setIsEditing(true);
+                    }
+                  }}
+                  className={`flex flex-col items-center group ${!isSpinning && onSetCustomChance ? 'cursor-pointer hover:scale-105' : ''} transition-transform`}
+                  title="Кликните, чтобы задать свой шанс"
+                >
+                  <div className="flex items-baseline gap-1">
+                    <span className="font-rajdhani font-black text-4xl text-white tracking-tight drop-shadow-md">
+                      {winProbability.toFixed(2)}
+                    </span>
+                    <span className="text-2xl font-rajdhani font-black text-text-secondary">
+                      %
+                    </span>
+                    {!isSpinning && onSetCustomChance && (
+                      <Edit2 className="w-3 h-3 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity ml-0.5" />
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div
+                className={`
+                  mt-1.5 px-3 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase border
+                  ${safetyStatus.color} ${safetyStatus.bg} border-current/30 shadow-sm
+                `}
+              >
+                {safetyStatus.label}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

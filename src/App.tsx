@@ -11,7 +11,6 @@ import { Footer } from './components/layout/Footer';
 import { SkinInspectModal } from './components/effects/SkinInspectModal';
 import { ProfileModal } from './components/profile/ProfileModal';
 import { FairVerifierModal } from './components/provably-fair/FairVerifierModal';
-import { RoundResultModal } from './components/upgrade/RoundResultModal';
 import { AirdropModal } from './components/effects/AirdropModal';
 
 // Hooks & Data
@@ -21,6 +20,7 @@ import { useAirdropTimer } from './hooks/useAirdropTimer';
 import { SKINS_MAP } from './data/skinsData';
 import { SkinDefinition, AvatarId } from './types';
 import { soundManager } from './utils/soundManager';
+import { Headphones } from 'lucide-react';
 
 interface ClickParticle {
   id: number;
@@ -50,14 +50,13 @@ export function App() {
     winProbability,
     safetyStatus,
     wheelRotation,
+    wheelOutcome,
+    outcomeSkin,
     isSpinning,
     turboMode,
     statusMessage,
-    lastRoundResult,
-    showResultModal,
     roundHistory,
     fairState,
-    setShowResultModal,
     toggleSelectItem,
     removeSelectedItem,
     clearSelectedItems,
@@ -134,20 +133,19 @@ export function App() {
       {/* Main Content Container */}
       <div className="relative z-10 flex flex-col justify-between min-h-screen">
         <div className="flex flex-col flex-1">
-          {/* Top Header strictly matching Photo 4 */}
+          {/* Top Header strictly matching Photo 5 */}
           <Header
             profile={profile}
             turboMode={turboMode}
             onToggleTurbo={() => setTurboMode(!turboMode)}
             onOpenFairModal={() => setIsFairModalOpen(true)}
             onOpenProfile={() => setIsProfileOpen(true)}
-            onOpenAirdrop={() => setShowAirdropClaimModal(true)}
             onMineScrap={handleMineScrap}
           />
 
           {/* Main Layout: Left Sidebar + Arena & Catalog */}
           <div className="flex flex-1 w-full">
-            {/* Left Sidebar (Photo 4: Wipe BP, Online, Upgrade stream) */}
+            {/* Left Sidebar (Photo 5: Wipe BP, Online, Upgrade stream) */}
             <LeftSidebar
               roundHistory={roundHistory}
               onInspectSkin={handleInspectSkinId}
@@ -166,6 +164,8 @@ export function App() {
                   winProbability={winProbability}
                   safetyStatus={safetyStatus}
                   wheelRotation={wheelRotation}
+                  wheelOutcome={wheelOutcome}
+                  outcomeSkin={outcomeSkin}
                   isSpinning={isSpinning}
                   turboMode={turboMode}
                   statusMessage={statusMessage}
@@ -184,7 +184,7 @@ export function App() {
                 aria-label="Inventory and Catalog"
                 className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5 items-stretch"
               >
-                {/* Left: User Inventory & Shop (Фото 2 & 4) */}
+                {/* Left: User Inventory & Shop (Фото 5 & 2) */}
                 <UserInventory
                   inventory={profile.inventory}
                   userBalance={profile.balance}
@@ -197,7 +197,7 @@ export function App() {
                   disabled={isSpinning}
                 />
 
-                {/* Right: Catalog Grid (51 skins) */}
+                {/* Right: Catalog Grid (51 skins matching Photo 5) */}
                 <CatalogGrid
                   selectedTargetSkin={targetSkin}
                   onSelectTarget={setTargetSkin}
@@ -211,6 +211,17 @@ export function App() {
 
         {/* Footer */}
         <Footer />
+      </div>
+
+      {/* Floating Support Chat Icon in bottom right corner strictly matching Photo 5 */}
+      <div className="fixed bottom-4 right-4 z-40">
+        <button
+          onClick={() => setIsProfileOpen(true)}
+          className="w-12 h-12 rounded-full bg-[#E53935] hover:bg-[#D32F2F] text-white flex items-center justify-center shadow-[0_4px_16px_rgba(229,57,53,0.5)] transition-all hover:scale-105 active:scale-95"
+          title="Служба поддержки"
+        >
+          <Headphones className="w-6 h-6" />
+        </button>
       </div>
 
       {/* MODALS */}
@@ -243,13 +254,6 @@ export function App() {
         onClose={() => setIsFairModalOpen(false)}
         fairState={fairState}
         roundHistory={roundHistory}
-      />
-
-      {/* Round Result Modal */}
-      <RoundResultModal
-        round={lastRoundResult}
-        isOpen={showResultModal}
-        onClose={() => setShowResultModal(false)}
       />
 
       {/* Airdrop Event Modal */}

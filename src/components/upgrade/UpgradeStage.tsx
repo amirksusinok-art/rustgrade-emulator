@@ -22,6 +22,8 @@ interface UpgradeStageProps {
   isSpinning: boolean;
   turboMode: boolean;
   statusMessage: string | null;
+  wheelOutcome?: 'idle' | 'win' | 'lose';
+  outcomeSkin?: SkinDefinition | null;
   onRemoveItem: (instanceId: string) => void;
   onClearAll: () => void;
   onSliderChange: (val: number) => void;
@@ -43,6 +45,8 @@ export const UpgradeStage: React.FC<UpgradeStageProps> = ({
   isSpinning,
   turboMode,
   statusMessage,
+  wheelOutcome = 'idle',
+  outcomeSkin = null,
   onRemoveItem,
   onClearAll,
   onSliderChange,
@@ -53,13 +57,13 @@ export const UpgradeStage: React.FC<UpgradeStageProps> = ({
 }) => {
   return (
     <div className="w-full flex flex-col items-center select-none">
-      {/* Center Logo & Mini Icons strictly matching Photo 4 */}
-      <div className="flex flex-col items-center mb-3">
-        <div className="flex items-center gap-1.5 cursor-pointer">
-          <div className="w-6 h-6 rounded bg-[#E53935] flex items-center justify-center text-white shadow-[0_0_10px_rgba(229,57,53,0.5)]">
-            <ChevronUp className="w-4 h-4 stroke-[3]" />
+      {/* Center Logo strictly matching Photo 5 */}
+      <div className="flex flex-col items-center mb-4">
+        <div className="flex items-center gap-2 cursor-pointer group">
+          <div className="w-7 h-7 rounded bg-[#E53935] flex items-center justify-center text-white shadow-[0_0_12px_rgba(229,57,53,0.6)]">
+            <ChevronUp className="w-5 h-5 stroke-[3]" />
           </div>
-          <span className="font-rajdhani font-black text-2xl text-white tracking-widest">
+          <span className="font-rajdhani font-black text-2xl md:text-3xl text-white tracking-widest">
             RUST<span className="text-[#E53935]">GRADE</span>
           </span>
         </div>
@@ -67,13 +71,13 @@ export const UpgradeStage: React.FC<UpgradeStageProps> = ({
 
       {/* Warning banner */}
       {statusMessage && (
-        <div className="mb-2 px-3 py-1 rounded bg-red-600/20 border border-red-500/40 text-red-200 text-xs font-bold flex items-center gap-1.5">
+        <div className="mb-2 px-3 py-1 rounded bg-red-600/20 border border-red-500/40 text-red-200 text-xs font-bold flex items-center gap-1.5 animate-fade-in">
           <AlertTriangle className="w-3.5 h-3.5 text-primary-red" />
           <span>{statusMessage}</span>
         </div>
       )}
 
-      {/* Arena 3-Column Grid matching Photo 4 */}
+      {/* Arena 3-Column Grid strictly matching Photo 5 */}
       <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-4 items-start">
         {/* Left Slot: 4 cols */}
         <div className="lg:col-span-4 flex flex-col">
@@ -97,10 +101,12 @@ export const UpgradeStage: React.FC<UpgradeStageProps> = ({
             isSpinning={isSpinning}
             turboMode={turboMode}
             safetyStatus={safetyStatus}
+            wheelOutcome={wheelOutcome}
+            outcomeSkin={outcomeSkin}
             onSetCustomChance={(ch) => onApplyChance(ch, 'auto')}
           />
 
-          {/* Big Red UPGRADE Button strictly matching Photo 4 */}
+          {/* Big Burgundy-Red UPGRADE Button strictly matching Photo 5 */}
           <div className="w-full px-2 mt-3">
             <button
               disabled={isSpinning}
@@ -110,7 +116,7 @@ export const UpgradeStage: React.FC<UpgradeStageProps> = ({
                 ${
                   isSpinning
                     ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
-                    : 'bg-[#C62828] hover:bg-[#D32F2F] active:bg-[#B71C1C] text-white shadow-[0_4px_15px_rgba(198,40,40,0.5)] active:scale-[0.98]'
+                    : 'bg-[#541D1E] hover:bg-[#682324] active:bg-[#431617] text-white border border-[#7D292B]/60 shadow-[0_4px_18px_rgba(84,29,30,0.7)] active:scale-[0.98]'
                 }
               `}
             >
@@ -135,7 +141,7 @@ export const UpgradeStage: React.FC<UpgradeStageProps> = ({
             onInspect={onInspectTarget}
           />
 
-          {/* Multipliers & Chances directly below Right Slot (Фото 4) */}
+          {/* Multipliers & Chances directly below Right Slot (Фото 5) */}
           <Multipliers
             currentChance={winProbability}
             onApplyMultiplier={onApplyMultiplier}

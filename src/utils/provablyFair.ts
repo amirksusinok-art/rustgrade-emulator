@@ -69,8 +69,9 @@ export async function calculateUpgradeRoll(
 
 export function calculateWinChance(inputValue: number, targetValue: number): number {
   if (targetValue <= 0 || inputValue <= 0) return 0;
-  // Formula: P = min(79.99, max(1.00, (V_input / V_target) * 0.95 * 100))
+  // Formula: P = min(95.00, max(1.00, (V_input / V_target) * 0.95 * 100))
+  // In Rustgrade, max win chance is 95.00% (5% house edge)
   const rawP = (inputValue / targetValue) * 0.95 * 100;
-  const clamped = Math.min(79.99, Math.max(1.00, rawP));
+  const clamped = Math.min(95.00, Math.max(1.00, rawP));
   return Number(clamped.toFixed(2));
 }

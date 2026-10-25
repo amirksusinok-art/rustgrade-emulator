@@ -26,8 +26,8 @@ const SOUND_CONFIGS: Record<SoundId, SoundConfig> = {
   item_select: { file: '/audio/item_select.mp3', volume: 0.6 },
   scrap_sell: { file: '/audio/scrap_sell.mp3', volume: 0.75 },
   codelock_error: { file: '/audio/codelock_error.mp3', volume: 0.7 },
-  airdrop_plane: { file: '/audio/airdrop-plane.mp3', volume: 0.85 },
-  airdrop_land: { file: '/audio/airdrop_land.mp3', volume: 0.9 },
+  airdrop_plane: { file: '/audio/airdrop-plane.mp3', volume: 0.18 },
+  airdrop_land: { file: '/audio/airdrop_land.mp3', volume: 0.22 },
 };
 
 class SoundManager {

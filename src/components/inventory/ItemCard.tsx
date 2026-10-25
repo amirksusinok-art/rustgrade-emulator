@@ -148,7 +148,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
           {skin.name}
         </span>
 
-        <div className="flex items-center justify-center gap-1 mt-0.5 font-rajdhani font-bold text-xs text-white">
+        <div className="flex items-center justify-center gap-1 mt-0.5 font-rajdhani font-black text-xs text-[#FFD54F]">
           <span className="text-[10px]">⚙️</span>
           <span>{skin.price.toFixed(2)}</span>
         </div>

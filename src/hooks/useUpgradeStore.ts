@@ -22,6 +22,9 @@ export function useUpgradeStore() {
   const [fairState, setFairState] = useState<StoredFairState | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
+  const [wheelOutcome, setWheelOutcome] = useState<'idle' | 'win' | 'lose'>('idle');
+  const [outcomeSkin, setOutcomeSkin] = useState<SkinDefinition | null>(null);
+
   // Initialize Fair State & History
   useEffect(() => {
     loadFairState().then(setFairState);
@@ -137,7 +140,7 @@ export function useUpgradeStore() {
     mode: 'auto' | 'skin' | 'slider' = 'auto'
   ) => {
     if (isSpinning) return;
-    const clampedChance = Math.min(79.99, Math.max(1.00, chancePercent));
+    const clampedChance = Math.min(95.00, Math.max(1.00, chancePercent));
 
     if (mode === 'slider' && targetSkin) {
       // Calculate required total input: V_needed = (V_target * P) / 95
@@ -243,13 +246,15 @@ export function useUpgradeStore() {
       const isJackpot = fairResult.isWin && (winProbability < 10.0 || targetSkin.rarity === 'contraband');
 
       if (fairResult.isWin) {
+        setWheelOutcome('win');
+        setOutcomeSkin(targetSkin);
         if (isJackpot) {
           soundManager.play('jackpot');
           try {
             confetti({
-              particleCount: 120,
-              spread: 80,
-              origin: { y: 0.6 },
+              particleCount: 150,
+              spread: 90,
+              origin: { y: 0.5 },
               colors: ['#FFB800', '#FF9800', '#E53935', '#FFFFFF'],
             });
           } catch {
@@ -257,13 +262,30 @@ export function useUpgradeStore() {
           }
         } else {
           soundManager.play('win');
+          try {
+            confetti({
+              particleCount: 80,
+              spread: 70,
+              origin: { y: 0.5 },
+              colors: ['#4CAF50', '#FFD54F', '#FFFFFF'],
+            });
+          } catch {
+            // Confetti fallback
+          }
         }
 
         // Add won skin to inventory
         addSkin(targetSkin.id);
       } else {
+        setWheelOutcome('lose');
+        setOutcomeSkin(targetSkin);
         soundManager.play('lose');
       }
+
+      // Automatically reset wheel outcome to 'idle' after 4.5 seconds
+      setTimeout(() => {
+        setWheelOutcome('idle');
+      }, 4500);
 
       // Deduct scrap & items
       if (scrapSlider > 0) {
@@ -294,7 +316,8 @@ export function useUpgradeStore() {
       };
 
       setLastRoundResult(roundRecord);
-      setShowResultModal(true);
+      // DO NOT show popup modal! Result is shown directly on the wheel
+      setShowResultModal(false);
       recordRoundResult(roundRecord);
 
       const updatedHistory = [roundRecord, ...roundHistory.slice(0, 49)];
@@ -349,6 +372,8 @@ export function useUpgradeStore() {
     isSpinning,
     turboMode,
     wheelRotation,
+    wheelOutcome,
+    outcomeSkin,
     lastRoundResult,
     showResultModal,
     roundHistory,
