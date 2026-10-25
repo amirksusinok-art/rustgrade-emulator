@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { AvatarId } from '../../types';
 import { ScrapIcon } from '../common/ScrapIcon';
 import { soundManager } from '../../utils/soundManager';
-import { ShieldCheck, User, Key, Sparkles, Check, ChevronRight } from 'lucide-react';
+import { ShieldCheck, User, Key, Sparkles, Check, ChevronRight, X } from 'lucide-react';
 
 interface WelcomeModalProps {
   isOpen: boolean;
   currentNickname: string;
   currentSteamId?: string;
   currentAvatar: AvatarId;
+  onClose?: () => void;
   onComplete: (nickname: string, steamId: string, avatar: AvatarId) => void;
 }
 
@@ -24,6 +25,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
   currentNickname,
   currentSteamId,
   currentAvatar,
+  onClose,
   onComplete,
 }) => {
   const [nickname, setNickname] = useState<string>(() => {
@@ -45,8 +47,18 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleFinish = (cleanNick: string, cleanId: string, avatar: AvatarId) => {
+    soundManager.play('scrap_sell');
+    try {
+      localStorage.setItem('rustgrade_onboarding_completed', 'true');
+    } catch {
+      // ignore
+    }
+    onComplete(cleanNick, cleanId, avatar);
+  };
+
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     const cleanNick = nickname.trim();
     const cleanId = steamId.trim();
 
@@ -60,24 +72,23 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
       return;
     }
 
-    soundManager.play('scrap_sell');
-    try {
-      localStorage.setItem('rustgrade_onboarding_completed', 'true');
-    } catch {
-      // ignore
-    }
+    handleFinish(cleanNick, cleanId, selectedAvatar);
+  };
 
-    onComplete(cleanNick, cleanId, selectedAvatar);
+  const handleSkip = () => {
+    const cleanNick = nickname.trim() || `Survivor_${Math.floor(1000 + Math.random() * 9000)}`;
+    const cleanId = steamId.trim() || `76561198${Math.floor(100000000 + Math.random() * 900000000)}`;
+    handleFinish(cleanNick, cleanId, selectedAvatar);
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md animate-fade-in select-none">
       <div className="relative w-full max-w-xl bg-gradient-to-b from-[#181C26] to-[#0E1118] border-2 border-[#2B3448] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.85)] overflow-hidden flex flex-col">
         {/* Metal corner rivets */}
-        <div className="absolute top-2.5 left-2.5 w-2 h-2 rounded-full bg-zinc-500 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]" />
-        <div className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-zinc-500 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]" />
-        <div className="absolute bottom-2.5 left-2.5 w-2 h-2 rounded-full bg-zinc-500 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]" />
-        <div className="absolute bottom-2.5 right-2.5 w-2 h-2 rounded-full bg-zinc-500 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]" />
+        <div className="absolute top-2.5 left-2.5 w-2 h-2 rounded-full bg-zinc-500 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] pointer-events-none" />
+        <div className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-zinc-500 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] pointer-events-none" />
+        <div className="absolute bottom-2.5 left-2.5 w-2 h-2 rounded-full bg-zinc-500 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] pointer-events-none" />
+        <div className="absolute bottom-2.5 right-2.5 w-2 h-2 rounded-full bg-zinc-500 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] pointer-events-none" />
 
         {/* Tactical Header Bar */}
         <div className="bg-[#12151E] border-b border-[#242C3C] px-5 py-3.5 flex items-center justify-between">
@@ -87,7 +98,19 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
               ПОДКЛЮЧЕНИЕ К СЕРВЕРУ • [EU/RU] RUSTGRADE #1
             </span>
           </div>
-          <span className="font-mono text-[10px] text-zinc-500">PORT: 28015</span>
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-[10px] text-zinc-500 hidden sm:inline">PORT: 28015</span>
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-1 rounded-lg bg-[#1B202A] hover:bg-[#262B37] text-zinc-400 hover:text-white transition-colors"
+                title="Закрыть"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Modal Body */}
@@ -137,7 +160,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
                 setErrorMsg('');
               }}
               maxLength={20}
-              placeholder="Например: Trausi_God, Rusty_Fox..."
+              placeholder="Например: Rusty_Fox, Trausi..."
               className="w-full px-3.5 py-2.5 rounded-xl bg-[#0D1017] border border-[#2B3549] text-sm font-bold text-white placeholder-zinc-600 focus:outline-none focus:border-[#E53935] focus:ring-1 focus:ring-[#E53935]/40 transition-all font-mono"
             />
           </div>
@@ -169,7 +192,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
               className="w-full px-3.5 py-2.5 rounded-xl bg-[#0D1017] border border-[#2B3549] text-sm font-bold text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/40 transition-all font-mono"
             />
             <span className="text-[10px] text-zinc-500 font-sans">
-              Будет закреплен за твоим инвентарем и отображаться в сезонных таблицах лидеров.
+              Закрепляется за твоим инвентарем и отображается в рейтингах.
             </span>
           </div>
 
@@ -215,15 +238,25 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
             </div>
           )}
 
-          {/* Action Button */}
-          <button
-            type="submit"
-            onClick={handleSubmit}
-            className="w-full mt-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#4CAF50] to-[#388E3C] hover:from-[#43A047] hover:to-[#2E7D32] text-white font-rajdhani font-black text-base uppercase tracking-wider shadow-[0_6px_25px_rgba(76,175,80,0.45)] active:scale-[0.99] transition-all flex items-center justify-center gap-2 group cursor-pointer"
-          >
-            <span>ВОЙТИ НА СЕРВЕР (+10.00 ⚙️ БОНУС)</span>
-            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform stroke-[2.5]" />
-          </button>
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-center gap-3 mt-2">
+            <button
+              type="submit"
+              onClick={() => handleSubmit()}
+              className="w-full flex-1 py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#4CAF50] to-[#388E3C] hover:from-[#43A047] hover:to-[#2E7D32] text-white font-rajdhani font-black text-base uppercase tracking-wider shadow-[0_6px_25px_rgba(76,175,80,0.45)] active:scale-[0.99] transition-all flex items-center justify-center gap-2 group cursor-pointer"
+            >
+              <span>ВОЙТИ НА СЕРВЕР (+10.00 ⚙️)</span>
+              <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform stroke-[2.5]" />
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSkip}
+              className="w-full sm:w-auto py-3.5 px-4 rounded-xl bg-[#171B24] hover:bg-[#202532] text-zinc-400 hover:text-white border border-[#2B3448] font-rajdhani font-bold text-xs uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap"
+            >
+              Пропустить
+            </button>
+          </div>
         </form>
       </div>
     </div>

@@ -272,12 +272,14 @@ export function App() {
                   onUnstakeSkin={unstakeSkin}
                   onClaimYield={claimStakingYield}
                   onInspectSkin={handleInspectSkinId}
+                  onSelectTab={setActiveNavTab}
                 />
               ) : activeNavTab === 'leaderboard' ? (
                 /* Seasonal Leaderboard & Hall of Fame */
                 <LeaderboardView
                   profile={profile}
                   onInspectSkin={handleInspectSkinId}
+                  onSelectTab={setActiveNavTab}
                 />
               ) : (
                 /* Core Upgrade View */
@@ -434,6 +436,7 @@ export function App() {
         currentNickname={profile.nickname}
         currentSteamId={profile.steamId}
         currentAvatar={profile.avatar as AvatarId}
+        onClose={() => setIsWelcomeOpen(false)}
         onComplete={(nick, sid, av) => {
           updateProfileDetails(nick, sid, av);
           addScrap(10);

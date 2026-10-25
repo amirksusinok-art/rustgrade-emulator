@@ -11,6 +11,7 @@ interface StakingViewProps {
   onUnstakeSkin: (instanceId: string) => boolean;
   onClaimYield: () => number;
   onInspectSkin: (skinId: string) => void;
+  onSelectTab?: (tab: 'upgrade' | 'furnace' | 'cases' | 'staking' | 'leaderboard') => void;
 }
 
 export const StakingView: React.FC<StakingViewProps> = ({
@@ -19,6 +20,7 @@ export const StakingView: React.FC<StakingViewProps> = ({
   onUnstakeSkin,
   onClaimYield,
   onInspectSkin,
+  onSelectTab,
 }) => {
   const stakedItems = profile.stakedItems || [];
 
@@ -244,14 +246,30 @@ export const StakingView: React.FC<StakingViewProps> = ({
             </div>
 
             {eligibleInventory.length === 0 ? (
-              <div className="py-16 flex flex-col items-center justify-center text-center text-zinc-400 space-y-3">
+              <div className="py-14 flex flex-col items-center justify-center text-center text-zinc-400 space-y-3">
                 <div className="w-16 h-16 rounded-2xl bg-[#1A1F2B] border border-zinc-700 flex items-center justify-center text-3xl">
                   🎒
                 </div>
                 <h4 className="font-rajdhani font-black text-lg text-white uppercase">Нет скинов от 50 ⚙️</h4>
-                <p className="text-xs max-w-sm text-zinc-400">
+                <p className="text-xs max-w-sm text-zinc-400 leading-relaxed font-sans">
                   Чтобы сдать скин в аренду кланам, получите скин стоимостью от 50 ⚙️ в Апгрейдере или открывайте Военные и Элитные кейсы!
                 </p>
+                {onSelectTab && (
+                  <div className="flex items-center gap-2 pt-2">
+                    <button
+                      onClick={() => onSelectTab('upgrade')}
+                      className="px-3.5 py-2 rounded-xl bg-[#E53935] hover:bg-[#D32F2F] text-white font-rajdhani font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(229,57,53,0.3)] cursor-pointer"
+                    >
+                      В Апгрейдер
+                    </button>
+                    <button
+                      onClick={() => onSelectTab('cases')}
+                      className="px-3.5 py-2 rounded-xl bg-[#2196F3] hover:bg-[#1E88E5] text-white font-rajdhani font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(33,150,243,0.3)] cursor-pointer"
+                    >
+                      Кейсы
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[500px] overflow-y-auto pr-1 scrollbar-thin">

@@ -62,11 +62,11 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </div>
 
-          {/* Navigation Tabs: UPGRADE & ПЕРЕПЛАВКА & КЕЙСЫ */}
-          <nav className="flex items-center gap-1.5 ml-2">
+          {/* Navigation Tabs: UPGRADE & ПЕРЕПЛАВКА & КЕЙСЫ & АРЕНДА & РЕЙТИНГИ */}
+          <nav className="flex items-center gap-1 sm:gap-1.5 ml-1 md:ml-3 overflow-x-auto no-scrollbar py-0.5 max-w-[55vw] sm:max-w-none">
             <button
               onClick={() => onSelectTab && onSelectTab('upgrade')}
-              className={`flex items-center gap-1.5 px-3 md:px-4 py-1.5 rounded-t text-xs font-black uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 md:px-4 py-1.5 rounded-t text-xs font-black uppercase tracking-wider transition-all shrink-0 whitespace-nowrap ${
                 activeTab === 'upgrade'
                   ? 'bg-[#2A1618] border-t-2 border-[#E53935] text-white shadow-sm'
                   : 'bg-transparent text-text-muted hover:text-white'
@@ -78,7 +78,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => onSelectTab && onSelectTab('furnace')}
-              className={`flex items-center gap-1.5 px-3 md:px-4 py-1.5 rounded-t text-xs font-black uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 md:px-4 py-1.5 rounded-t text-xs font-black uppercase tracking-wider transition-all shrink-0 whitespace-nowrap ${
                 activeTab === 'furnace'
                   ? 'bg-[#2E180E] border-t-2 border-[#FF9800] text-white shadow-sm'
                   : 'bg-transparent text-text-muted hover:text-white'
@@ -90,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => onSelectTab && onSelectTab('cases')}
-              className={`flex items-center gap-1.5 px-3 md:px-4 py-1.5 rounded-t text-xs font-black uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 md:px-4 py-1.5 rounded-t text-xs font-black uppercase tracking-wider transition-all shrink-0 whitespace-nowrap ${
                 activeTab === 'cases'
                   ? 'bg-[#182538] border-t-2 border-[#2196F3] text-white shadow-sm'
                   : 'bg-transparent text-text-muted hover:text-white'
@@ -102,7 +102,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => onSelectTab && onSelectTab('staking')}
-              className={`flex items-center gap-1.5 px-3 md:px-4 py-1.5 rounded-t text-xs font-black uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 md:px-4 py-1.5 rounded-t text-xs font-black uppercase tracking-wider transition-all shrink-0 whitespace-nowrap ${
                 activeTab === 'staking'
                   ? 'bg-[#0F291E] border-t-2 border-[#10B981] text-white shadow-sm'
                   : 'bg-transparent text-text-muted hover:text-white'
@@ -117,7 +117,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => onSelectTab && onSelectTab('leaderboard')}
-              className={`flex items-center gap-1.5 px-3 md:px-4 py-1.5 rounded-t text-xs font-black uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 md:px-4 py-1.5 rounded-t text-xs font-black uppercase tracking-wider transition-all shrink-0 whitespace-nowrap ${
                 activeTab === 'leaderboard'
                   ? 'bg-[#2D240E] border-t-2 border-[#F59E0B] text-white shadow-sm'
                   : 'bg-transparent text-text-muted hover:text-white'
@@ -196,13 +196,19 @@ export const Header: React.FC<HeaderProps> = ({
             <Bell className="w-3.5 h-3.5" />
           </button>
 
-          {/* User Avatar */}
+          {/* User Avatar with Champion Badge */}
           <button
             onClick={onOpenProfile}
-            className="w-8 h-8 rounded bg-[#202530] border border-[#2B313E] flex items-center justify-center text-sm shadow hover:border-primary-red transition-all"
-            title="Мой профиль"
+            className="w-8 h-8 rounded bg-[#202530] border border-[#2B313E] flex items-center justify-center text-sm shadow hover:border-primary-red transition-all relative shrink-0"
+            title="Мой профиль и статистика"
           >
             {AVATAR_ICONS[profile.avatar as AvatarId] || <User className="w-4 h-4 text-white" />}
+            <span
+              className="absolute -top-1.5 -right-1 text-[11px] drop-shadow-[0_0_4px_rgba(255,213,79,0.8)]"
+              title="Чемпион Сезона 12"
+            >
+              🥇
+            </span>
           </button>
         </div>
       </div>
