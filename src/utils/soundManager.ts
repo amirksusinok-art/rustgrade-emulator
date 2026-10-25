@@ -11,7 +11,11 @@ export type SoundId =
   | 'airdrop_plane'
   | 'airdrop_land'
   | 'furnace_turn_on'
-  | 'furnace_loop';
+  | 'furnace_loop'
+  | 'cargo'
+  | 'crack_system'
+  | 'pipi'
+  | 'cargo_open';
 
 interface SoundConfig {
   file: string;
@@ -32,6 +36,10 @@ const SOUND_CONFIGS: Record<SoundId, SoundConfig> = {
   airdrop_land: { file: '/audio/airdrop_land.mp3', volume: 0.22 },
   furnace_turn_on: { file: '/audio/furnace_turn_on.wav', volume: 0.75 },
   furnace_loop: { file: '/audio/furnace_loop.wav', volume: 0.6 },
+  cargo: { file: '/audio/cargo.mp3', volume: 0.8 },
+  crack_system: { file: '/audio/crack_system.mp3', volume: 0.65 },
+  pipi: { file: '/audio/pipi.mp3', volume: 0.75 },
+  cargo_open: { file: '/audio/open.mp3', volume: 0.85 },
 };
 
 class SoundManager {

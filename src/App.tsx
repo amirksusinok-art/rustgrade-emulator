@@ -19,11 +19,14 @@ import { AirdropModal } from './components/effects/AirdropModal';
 import { AdminModal } from './components/admin/AdminModal';
 import { CaseRouletteModal } from './components/cases/CaseRouletteModal';
 import { WelcomeModal } from './components/auth/WelcomeModal';
+import { CargoShipBanner } from './components/effects/CargoShipBanner';
+import { CargoShipModal } from './components/effects/CargoShipModal';
 
 // Hooks & Data
 import { useUserStore } from './hooks/useUserStore';
 import { useUpgradeStore } from './hooks/useUpgradeStore';
 import { useAirdropTimer } from './hooks/useAirdropTimer';
+import { useCargoShipTimer, CargoReward } from './hooks/useCargoShipTimer';
 import { SKINS_MAP } from './data/skinsData';
 import { SkinDefinition, AvatarId, CaseDefinition } from './types';
 import { soundManager } from './utils/soundManager';
@@ -108,6 +111,27 @@ export function App() {
     spawnAirdrop,
     handleClaim: handleClaimAirdrop,
   } = useAirdropTimer();
+
+  const {
+    isActive: isCargoActive,
+    bannerTimeLeft: cargoBannerTimeLeft,
+    isModalOpen: isCargoModalOpen,
+    currentReward: cargoReward,
+    spawnCargoShip,
+    handleBoardShip,
+    handleDismissBanner: handleDismissCargoBanner,
+    handleCloseModal: handleCloseCargoModal,
+  } = useCargoShipTimer(true);
+
+  // Global dev helper for easy testing
+  useEffect(() => {
+    (window as any).triggerCargoShip = spawnCargoShip;
+    (window as any).triggerAirdrop = spawnAirdrop;
+    return () => {
+      delete (window as any).triggerCargoShip;
+      delete (window as any).triggerAirdrop;
+    };
+  }, [spawnCargoShip, spawnAirdrop]);
 
   // Modal States
   const [inspectSkin, setInspectSkin] = useState<SkinDefinition | null>(null);
@@ -201,6 +225,28 @@ export function App() {
       setSelectedCaseForModal(null);
     },
     [addSkin, selectSingleItem]
+  );
+
+  // Claim Cargo Ship reward directly to user inventory
+  const handleClaimCargoToInventory = useCallback(
+    (reward: CargoReward) => {
+      addScrap(reward.scrap);
+      addSkin(reward.skin.id);
+      soundManager.play('scrap_sell');
+    },
+    [addScrap, addSkin]
+  );
+
+  // Send won Cargo Ship skin directly to Upgrader
+  const handleSendCargoToUpgrader = useCallback(
+    (skinId: string, bonusScrap: number) => {
+      addScrap(bonusScrap);
+      const instanceId = addSkin(skinId);
+      selectSingleItem(instanceId);
+      setActiveNavTab('upgrade');
+      soundManager.play('scrap_sell');
+    },
+    [addScrap, addSkin, selectSingleItem]
   );
 
   return (
@@ -370,6 +416,7 @@ export function App() {
         onClearInventory={clearInventory}
         onImportProfile={importProfile}
         onTriggerAirdrop={spawnAirdrop}
+        onTriggerCargoShip={spawnCargoShip}
         onResetProgress={resetProgress}
       />
 
@@ -416,6 +463,23 @@ export function App() {
           onCloseClaimModal={() => setShowAirdropClaimModal(false)}
         />
       )}
+
+      {/* Cargo Ship Event Top Alert Banner */}
+      <CargoShipBanner
+        isActive={isCargoActive && !isCargoModalOpen}
+        timeLeft={cargoBannerTimeLeft}
+        onBoard={handleBoardShip}
+        onDismiss={handleDismissCargoBanner}
+      />
+
+      {/* Cargo Ship Event Interactive Modal */}
+      <CargoShipModal
+        isOpen={isCargoModalOpen}
+        reward={cargoReward}
+        onClose={handleCloseCargoModal}
+        onClaimToInventory={handleClaimCargoToInventory}
+        onSendToUpgrader={handleSendCargoToUpgrader}
+      />
       {/* Case Opening Roulette Modal */}
       <CaseRouletteModal
         caseDef={selectedCaseForModal}

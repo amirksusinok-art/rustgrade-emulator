@@ -24,6 +24,7 @@ import {
   CheckCircle,
   AlertTriangle,
   Plane,
+  Ship,
   Flame,
   Gauge,
   Sliders,
@@ -39,6 +40,7 @@ interface AdminModalProps {
   onClearInventory: () => void;
   onImportProfile: (imported: UserProfile) => void;
   onTriggerAirdrop?: () => void;
+  onTriggerCargoShip?: () => void;
   onResetProgress: () => void;
 }
 
@@ -53,6 +55,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   onClearInventory,
   onImportProfile,
   onTriggerAirdrop,
+  onTriggerCargoShip,
   onResetProgress,
 }) => {
   // Authentication State
@@ -861,9 +864,38 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                             onTriggerAirdrop();
                             onClose();
                           }}
-                          className="px-4 py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-black uppercase tracking-wider transition-all"
+                          className="px-4 py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap"
                         >
                           Сбросить Airdrop
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Event Trigger: Cargo Ship */}
+                  {onTriggerCargoShip && (
+                    <div className="p-4 rounded-xl bg-[#151821] border border-[#232731]">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <Ship className="w-4 h-4 text-amber-400" />
+                            <h4 className="font-rajdhani font-black text-base text-white uppercase tracking-wider">
+                              Вызвать Грузовой Корабль (Cargo Ship)
+                            </h4>
+                          </div>
+                          <p className="text-xs text-zinc-400">
+                            Мгновенно запускает гудок морского горна и появление сухогруза с запертым ящиком учёных.
+                          </p>
+                        </div>
+
+                        <button
+                          onClick={() => {
+                            onTriggerCargoShip();
+                            onClose();
+                          }}
+                          className="px-4 py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap"
+                        >
+                          Вызвать Корабль
                         </button>
                       </div>
                     </div>
