@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { LivingBackground } from './components/effects/LivingBackground';
 import { Header } from './components/layout/Header';
-import { LiveDropsBar } from './components/layout/LiveDropsBar';
+import { LeftSidebar } from './components/layout/LeftSidebar';
 import { UpgradeStage } from './components/upgrade/UpgradeStage';
 import { UserInventory } from './components/inventory/UserInventory';
 import { CatalogGrid } from './components/inventory/CatalogGrid';
@@ -22,12 +22,19 @@ import { SKINS_MAP } from './data/skinsData';
 import { SkinDefinition, AvatarId } from './types';
 import { soundManager } from './utils/soundManager';
 
+interface ClickParticle {
+  id: number;
+  x: number;
+  y: number;
+}
+
 export function App() {
   const {
     profile,
     addScrap,
     sellInventoryItem,
     sellAllSkins,
+    buySkin,
     updateAvatar,
     updateNickname,
     redeemPromoCode,
@@ -77,87 +84,129 @@ export function App() {
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const [isFairModalOpen, setIsFairModalOpen] = useState<boolean>(false);
 
+  // Particles for Mining Scrap
+  const [particles, setParticles] = useState<ClickParticle[]>([]);
+
   // Quick inspect opener
   const handleInspectSkinId = useCallback((skinId: string) => {
     const skin = SKINS_MAP[skinId];
     if (skin) setInspectSkin(skin);
   }, []);
 
+  // Mining Scrap click handler with sound and floating particle
+  const handleMineScrap = useCallback((e?: React.MouseEvent) => {
+    soundManager.play('barrel_hit');
+    addScrap(1.0);
+
+    const x = e ? e.clientX : window.innerWidth / 2;
+    const y = e ? e.clientY : 80;
+
+    const newParticle: ClickParticle = {
+      id: Date.now() + Math.random(),
+      x,
+      y,
+    };
+
+    setParticles((prev) => [...prev, newParticle]);
+    setTimeout(() => {
+      setParticles((prev) => prev.filter((p) => p.id !== newParticle.id));
+    }, 1000);
+  }, [addScrap]);
+
   return (
     <div className="min-h-screen bg-bg-main text-text-primary flex flex-col justify-between relative selection:bg-primary-red selection:text-white">
       {/* Living Atmospheric Rust Background (sparks, hangar gradient, swinging lamp) */}
       <LivingBackground />
 
+      {/* Floating particles on Scrap click */}
+      <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+        {particles.map((p) => (
+          <div
+            key={p.id}
+            className="absolute font-rajdhani font-black text-lg text-[#FFD54F] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] animate-float-up"
+            style={{ left: p.x - 25, top: p.y - 20 }}
+          >
+            +1.00 ⚙️
+          </div>
+        ))}
+      </div>
+
       {/* Main Content Container */}
       <div className="relative z-10 flex flex-col justify-between min-h-screen">
-        <div>
-          {/* Top Header */}
+        <div className="flex flex-col flex-1">
+          {/* Top Header strictly matching Photo 4 */}
           <Header
             profile={profile}
             turboMode={turboMode}
             onToggleTurbo={() => setTurboMode(!turboMode)}
             onOpenFairModal={() => setIsFairModalOpen(true)}
             onOpenProfile={() => setIsProfileOpen(true)}
+            onOpenAirdrop={() => setShowAirdropClaimModal(true)}
+            onMineScrap={handleMineScrap}
           />
 
-          {/* Real-time Drops Feed */}
-          <LiveDropsBar />
+          {/* Main Layout: Left Sidebar + Arena & Catalog */}
+          <div className="flex flex-1 w-full">
+            {/* Left Sidebar (Photo 4: Wipe BP, Online, Upgrade stream) */}
+            <LeftSidebar
+              roundHistory={roundHistory}
+              onInspectSkin={handleInspectSkinId}
+            />
 
-          {/* Main Content Wrapper */}
-          <main className="max-w-7xl mx-auto px-3 md:px-6 py-6 flex flex-col gap-8">
-            {/* 1. Core Upgrade Stage (Left Slot | Wheel & Multipliers | Target Slot) */}
-            <section aria-label="Upgrade Arena">
-              <UpgradeStage
-                selectedItems={selectedInventoryItems}
-                scrapSlider={scrapSlider}
-                userBalance={profile.balance}
-                totalInputValue={totalInputValue}
-                targetSkin={targetSkin}
-                winProbability={winProbability}
-                safetyStatus={safetyStatus}
-                wheelRotation={wheelRotation}
-                isSpinning={isSpinning}
-                turboMode={turboMode}
-                statusMessage={statusMessage}
-                onRemoveItem={removeSelectedItem}
-                onClearAll={clearSelectedItems}
-                onSliderChange={setScrapSlider}
-                onApplyMultiplier={applyMultiplier}
-                onApplyChance={applyTargetChance}
-                onExecuteUpgrade={executeUpgrade}
-                onInspectTarget={() => targetSkin && setInspectSkin(targetSkin)}
-              />
-            </section>
+            {/* Main Content Area */}
+            <main className="flex-1 max-w-[1550px] mx-auto px-3 sm:px-4 md:px-6 py-4 md:py-6 flex flex-col gap-6 w-full">
+              {/* 1. Core Upgrade Stage (Left Slot | Wheel & Button | Target Slot & Multipliers) */}
+              <section aria-label="Upgrade Arena">
+                <UpgradeStage
+                  selectedItems={selectedInventoryItems}
+                  scrapSlider={scrapSlider}
+                  userBalance={profile.balance}
+                  totalInputValue={totalInputValue}
+                  targetSkin={targetSkin}
+                  winProbability={winProbability}
+                  safetyStatus={safetyStatus}
+                  wheelRotation={wheelRotation}
+                  isSpinning={isSpinning}
+                  turboMode={turboMode}
+                  statusMessage={statusMessage}
+                  onRemoveItem={removeSelectedItem}
+                  onClearAll={clearSelectedItems}
+                  onSliderChange={setScrapSlider}
+                  onApplyMultiplier={applyMultiplier}
+                  onApplyChance={applyTargetChance}
+                  onExecuteUpgrade={executeUpgrade}
+                  onInspectTarget={() => targetSkin && setInspectSkin(targetSkin)}
+                />
+              </section>
 
-            {/* 2. Lower Split: User Inventory (50%) & Upgrade Catalog (50%) */}
-            <section
-              aria-label="Inventory and Catalog"
-              className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-6 items-stretch"
-            >
-              {/* Left: User Inventory */}
-              <UserInventory
-                inventory={profile.inventory}
-                selectedItemIds={selectedItemIds}
-                onToggleSelect={toggleSelectItem}
-                onSellItem={sellInventoryItem}
-                onSellAll={sellAllSkins}
-                onInspectSkin={handleInspectSkinId}
-                onMineScrap={() => {
-                  soundManager.play('barrel_hit');
-                  addScrap(1.0);
-                }}
-                disabled={isSpinning}
-              />
+              {/* 2. Lower Split: User Inventory & Shop (Left) & Upgrade Catalog (Right) */}
+              <section
+                aria-label="Inventory and Catalog"
+                className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5 items-stretch"
+              >
+                {/* Left: User Inventory & Shop (Фото 2 & 4) */}
+                <UserInventory
+                  inventory={profile.inventory}
+                  userBalance={profile.balance}
+                  selectedItemIds={selectedItemIds}
+                  onToggleSelect={toggleSelectItem}
+                  onSellItem={sellInventoryItem}
+                  onSellAll={sellAllSkins}
+                  onBuySkin={buySkin}
+                  onInspectSkin={handleInspectSkinId}
+                  disabled={isSpinning}
+                />
 
-              {/* Right: Catalog Grid (51 skins) */}
-              <CatalogGrid
-                selectedTargetSkin={targetSkin}
-                onSelectTarget={setTargetSkin}
-                onInspectSkin={handleInspectSkinId}
-                disabled={isSpinning}
-              />
-            </section>
-          </main>
+                {/* Right: Catalog Grid (51 skins) */}
+                <CatalogGrid
+                  selectedTargetSkin={targetSkin}
+                  onSelectTarget={setTargetSkin}
+                  onInspectSkin={handleInspectSkinId}
+                  disabled={isSpinning}
+                />
+              </section>
+            </main>
+          </div>
         </div>
 
         {/* Footer */}

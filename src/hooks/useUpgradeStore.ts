@@ -222,13 +222,13 @@ export function useUpgradeStore() {
       winProbability
     );
 
-    // Visual angle calculation:
-    // When wheel rotates by R, the angle at the top 12:00 is (360 - (R % 360)) % 360.
-    // We want the angle at the top to be landingAngle.
-    // So targetMod = (360 - landingAngle) % 360.
-    const targetMod = (360 - (fairResult.landingAngle % 360)) % 360;
-    const currentMod = (wheelRotation % 360 + 360) % 360;
-    let delta = (targetMod - currentMod + 360) % 360;
+    // Arrow rotation calculation:
+    // The wheel plate is static. The arrow starts at 0° (top) and rotates clockwise.
+    // Victory sector spans [0, SectorAngle].
+    // Target position is fairResult.landingAngle.
+    const targetAngle = fairResult.landingAngle;
+    const currentMod = ((wheelRotation % 360) + 360) % 360;
+    let delta = ((targetAngle - currentMod) % 360 + 360) % 360;
     if (delta < 30) delta += 360;
 
     const fullSpins = turboMode ? 3 : 5;

@@ -27,10 +27,10 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
 
   const size = 320;
   const center = size / 2;
-  const outerRadius = 148;
-  const innerRadius = 100;
+  const outerRadius = 146;
+  const innerRadius = 96;
 
-  // Arc angle in degrees
+  // Win Sector arc angle in degrees (1° to 359.99°)
   const angle = Math.min(359.99, Math.max(1, (winProbability / 100) * 360));
 
   // Determine sector color
@@ -48,7 +48,7 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
       ? 'rgba(255, 152, 0, 0.45)'
       : 'rgba(229, 57, 53, 0.45)';
 
-  // Calculate sector path (donut arc)
+  // Polar to Cartesian (0° is at top 12:00)
   const polarToCartesian = (cx: number, cy: number, r: number, angleInDegrees: number) => {
     const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
     return {
@@ -66,6 +66,7 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
   const startInner = polarToCartesian(center, center, innerRadius, startAngle);
   const endInner = polarToCartesian(center, center, innerRadius, endAngle);
 
+  // SVG path for static victory sector arc
   const sectorPath = `
     M ${startOuter.x} ${startOuter.y}
     A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${endOuter.x} ${endOuter.y}
@@ -91,21 +92,116 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
   };
 
   return (
-    <div className="relative flex items-center justify-center select-none my-2 md:my-0">
+    <div className="relative flex items-center justify-center select-none my-2">
       {/* Outer Glow Halo */}
       <div
         className="absolute w-72 h-72 rounded-full pointer-events-none transition-colors duration-500"
         style={{
           boxShadow: `0 0 45px ${sectorGlow}`,
-          opacity: isSpinning ? 0.9 : 0.45,
+          opacity: isSpinning ? 0.9 : 0.4,
         }}
       />
 
-      {/* SVG Wheel Stage */}
+      {/* SVG Wheel Stage (320x320) */}
       <div className="relative w-[320px] h-[320px]">
-        {/* ROTATING DISK */}
+        {/* 1. COMPLETELY STATIC WHEEL PLATE (Фото 4: колесо стоит на месте, не крутится) */}
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible">
+          <defs>
+            <linearGradient id="wheelMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#252A36" />
+              <stop offset="50%" stopColor="#14171E" />
+              <stop offset="100%" stopColor="#2B3240" />
+            </linearGradient>
+
+            <linearGradient id="sectorFill" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor={sectorColor} stopOpacity="0.95" />
+              <stop offset="100%" stopColor={sectorColor} stopOpacity="0.80" />
+            </linearGradient>
+          </defs>
+
+          {/* Base dark rusty wheel plate */}
+          <circle
+            cx={center}
+            cy={center}
+            r={outerRadius}
+            fill="#12151B"
+            stroke="#20242E"
+            strokeWidth="3"
+          />
+
+          {/* Dark empty loss track */}
+          <circle
+            cx={center}
+            cy={center}
+            r={(outerRadius + innerRadius) / 2}
+            fill="none"
+            stroke="#0A0C0F"
+            strokeWidth={outerRadius - innerRadius}
+          />
+
+          {/* Win Sector Arc (Static in place) */}
+          <path
+            d={sectorPath}
+            fill="url(#sectorFill)"
+            stroke={sectorColor}
+            strokeWidth="1.5"
+            filter="drop-shadow(0px 0px 6px rgba(0,0,0,0.6))"
+          />
+
+          {/* Sector start divider line at 12:00 */}
+          <line
+            x1={center}
+            y1={center - innerRadius}
+            x2={center}
+            y2={center - outerRadius}
+            stroke="#ffffff"
+            strokeWidth="2"
+            opacity="0.8"
+          />
+
+          {/* Outer Steel Rim with Rivets */}
+          <circle
+            cx={center}
+            cy={center}
+            r={outerRadius + 8}
+            fill="none"
+            stroke="url(#wheelMetal)"
+            strokeWidth="14"
+          />
+          <circle
+            cx={center}
+            cy={center}
+            r={outerRadius + 15}
+            fill="none"
+            stroke="#0A0C0F"
+            strokeWidth="2"
+          />
+          <circle
+            cx={center}
+            cy={center}
+            r={outerRadius + 1}
+            fill="none"
+            stroke="#0A0C0F"
+            strokeWidth="2"
+          />
+
+          {/* Rivets */}
+          {rivets.map((r) => (
+            <circle
+              key={r.id}
+              cx={r.x}
+              cy={r.y}
+              r="2.5"
+              fill="#78909C"
+              stroke="#14171E"
+              strokeWidth="1"
+            />
+          ))}
+        </svg>
+
+        {/* 2. ROTATING POINTER / ARROW LAYER (Крутится только стрелка вокруг колеса!) */}
         <div
-          className="w-full h-full"
+          className="absolute inset-0 pointer-events-none z-20"
           style={{
             transform: `rotate(${rotation}deg)`,
             transition: isSpinning
@@ -113,105 +209,33 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
               : 'none',
           }}
         >
-          <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible">
-            <defs>
-              <linearGradient id="steelRim" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#2A303C" />
-                <stop offset="50%" stopColor="#14171E" />
-                <stop offset="100%" stopColor="#363C4E" />
-              </linearGradient>
-
-              <linearGradient id="sectorGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor={sectorColor} stopOpacity="0.95" />
-                <stop offset="100%" stopColor={sectorColor} stopOpacity="0.75" />
-              </linearGradient>
-            </defs>
-
-            {/* Base dark wheel disk */}
-            <circle
-              cx={center}
-              cy={center}
-              r={outerRadius}
-              fill="#14171E"
-              stroke="#262B37"
-              strokeWidth="4"
-            />
-
-            {/* Empty / Loss Track (dark graphite) */}
-            <circle
-              cx={center}
-              cy={center}
-              r={(outerRadius + innerRadius) / 2}
-              fill="none"
-              stroke="#0D0F12"
-              strokeWidth={outerRadius - innerRadius}
-            />
-
-            {/* Win Sector Arc */}
-            <path
-              d={sectorPath}
-              fill="url(#sectorGradient)"
-              stroke={sectorColor}
-              strokeWidth="1.5"
-              filter="drop-shadow(0px 0px 6px rgba(0,0,0,0.5))"
-            />
-
-            {/* Sector boundary divider line at 0 deg */}
-            <line
-              x1={center}
-              y1={center - innerRadius}
-              x2={center}
-              y2={center - outerRadius}
-              stroke="#ffffff"
-              strokeWidth="2"
-              strokeLinecap="round"
-              opacity="0.8"
-            />
-
-            {/* Outer Steel Rim with Rivets */}
-            <circle
-              cx={center}
-              cy={center}
-              r={outerRadius + 8}
-              fill="none"
-              stroke="url(#steelRim)"
-              strokeWidth="14"
-            />
-            <circle
-              cx={center}
-              cy={center}
-              r={outerRadius + 15}
-              fill="none"
-              stroke="#0D0F12"
-              strokeWidth="2"
-            />
-            <circle
-              cx={center}
-              cy={center}
-              r={outerRadius + 1}
-              fill="none"
-              stroke="#0D0F12"
-              strokeWidth="2"
-            />
-
-            {/* Rivets */}
-            {rivets.map((r) => (
-              <circle
-                key={r.id}
-                cx={r.x}
-                cy={r.y}
-                r="2.5"
-                fill="#8E9BAE"
-                stroke="#1B202A"
-                strokeWidth="1"
+          {/* Arrow Pointer positioned at the outer top perimeter, pointing toward the center */}
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex flex-col items-center filter drop-shadow-[0_4px_12px_rgba(229,57,53,0.8)]">
+            <svg width="26" height="30" viewBox="0 0 26 30">
+              {/* Rustgrade Arrow Triangle */}
+              <polygon
+                points="13,28 1,4 25,4"
+                fill="#E53935"
+                stroke="#FFFFFF"
+                strokeWidth="2"
+                strokeLinejoin="round"
               />
-            ))}
-          </svg>
+              {/* Internal white chevron emblem */}
+              <polyline
+                points="8,10 13,16 18,10"
+                fill="none"
+                stroke="#FFFFFF"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
         </div>
 
-        {/* STATIC CENTER HUB */}
+        {/* 3. STATIC CENTER HUB (Никогда не крутится, текст всегда строго вертикален) */}
         <div
-          className="absolute inset-0 m-auto w-[184px] h-[184px] rounded-full bg-gradient-to-b from-[#1B202A] via-[#14171E] to-[#0D0F12] border-4 border-[#262B37] shadow-[inset_0_4px_12px_rgba(0,0,0,0.8)] flex flex-col items-center justify-center z-10"
+          className="absolute inset-0 m-auto w-[184px] h-[184px] rounded-full bg-gradient-to-b from-[#1C2029] via-[#12151B] to-[#0A0C0F] border-4 border-[#242934] shadow-[inset_0_4px_16px_rgba(0,0,0,0.9)] flex flex-col items-center justify-center z-10"
         >
           {/* Subtle metal crosshair */}
           <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
@@ -220,7 +244,7 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
           </div>
 
           <span className="text-[10px] tracking-widest uppercase font-bold text-text-muted mb-0.5">
-            ШАНС УДАЧИ
+            ШАНС
           </span>
 
           {isEditing ? (
@@ -263,40 +287,26 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
                 }
               }}
               className={`flex items-center gap-1 group ${!isSpinning && onSetCustomChance ? 'cursor-pointer hover:scale-105' : ''} transition-transform`}
-              title="Кликните, чтобы задать свой точный шанс"
+              title="Кликните, чтобы задать свой шанс"
             >
               <span className="font-rajdhani font-black text-4xl text-white tracking-tight drop-shadow-md">
                 {winProbability.toFixed(2)}
                 <span className="text-2xl text-text-secondary ml-0.5">%</span>
               </span>
               {!isSpinning && onSetCustomChance && (
-                <Edit2 className="w-3.5 h-3.5 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Edit2 className="w-3 h-3 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
               )}
             </div>
           )}
 
           <div
             className={`
-              mt-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase border
+              mt-1.5 px-3 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase border
               ${safetyStatus.color} ${safetyStatus.bg} border-current/30 shadow-sm
             `}
           >
             {safetyStatus.label}
           </div>
-        </div>
-
-        {/* FIXED ARROW POINTER AT 12:00 */}
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center filter drop-shadow-[0_4px_10px_rgba(229,57,53,0.7)] pointer-events-none">
-          <svg width="28" height="28" viewBox="0 0 28 28">
-            <polygon
-              points="14,24 2,4 26,4"
-              fill="#E53935"
-              stroke="#FFFFFF"
-              strokeWidth="2"
-              strokeLinejoin="round"
-            />
-            <circle cx="14" cy="9" r="3.5" fill="#FFFFFF" />
-          </svg>
         </div>
       </div>
     </div>

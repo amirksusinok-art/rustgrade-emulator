@@ -234,6 +234,33 @@ export function useUserStore() {
     updateProfile(updated);
   }, []);
 
+  const buySkin = useCallback((skinId: string): boolean => {
+    const skin = SKINS_MAP[skinId];
+    if (!skin) return false;
+
+    if (globalProfile.balance < skin.price) {
+      soundManager.play('codelock_error');
+      return false;
+    }
+
+    soundManager.play('scrap_sell');
+    const instanceId = `inst_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const updated: UserProfile = {
+      ...globalProfile,
+      balance: Number((globalProfile.balance - skin.price).toFixed(2)),
+      inventory: [
+        {
+          instanceId,
+          skinId,
+          acquiredAt: Date.now(),
+        },
+        ...globalProfile.inventory,
+      ],
+    };
+    updateProfile(updated);
+    return true;
+  }, []);
+
   const resetProgress = useCallback(() => {
     const fresh = getDefaultProfile();
     updateProfile(fresh);
@@ -252,6 +279,7 @@ export function useUserStore() {
     updateNickname,
     claimAirdrop,
     redeemPromoCode,
+    buySkin,
     recordRoundResult,
     resetProgress,
   };

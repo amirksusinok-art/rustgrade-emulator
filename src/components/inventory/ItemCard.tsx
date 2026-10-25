@@ -1,6 +1,6 @@
 import React from 'react';
 import { SkinDefinition, ItemRarity } from '../../types';
-import { Eye, Trash2, Check } from 'lucide-react';
+import { Eye, Trash2, Check, ShoppingCart } from 'lucide-react';
 
 interface ItemCardProps {
   skin: SkinDefinition;
@@ -9,61 +9,49 @@ interface ItemCardProps {
   onInspect?: () => void;
   onSell?: () => void;
   onRemove?: () => void;
+  onBuy?: () => void;
+  isShopItem?: boolean;
   showSellButton?: boolean;
   compact?: boolean;
 }
 
-const RARITY_CONFIG: Record<
+const RARITY_THEMES: Record<
   ItemRarity,
   {
-    border: string;
     bg: string;
-    badge: string;
-    glow: string;
-    label: string;
+    borderTop: string;
+    textColor: string;
   }
 > = {
   contraband: {
-    border: 'border-[#FFB800]',
-    bg: 'from-[#3d3514] to-[#171610]',
-    badge: 'bg-[#FFB800]/20 text-[#FFB800] border-[#FFB800]/40',
-    glow: 'hover:shadow-[0_0_15px_rgba(255,184,0,0.35)]',
-    label: 'Contraband',
+    bg: 'bg-gradient-to-b from-[#5c4a16] via-[#3d310e] to-[#1c1606]',
+    borderTop: 'border-t-[#FFB800]',
+    textColor: 'text-[#FFD54F]',
   },
   master: {
-    border: 'border-[#E53935]',
-    bg: 'from-[#381616] to-[#181111]',
-    badge: 'bg-[#E53935]/20 text-[#E53935] border-[#E53935]/40',
-    glow: 'hover:shadow-[0_0_15px_rgba(229,57,53,0.35)]',
-    label: 'Master',
+    bg: 'bg-gradient-to-b from-[#4a1818] via-[#320f0f] to-[#170606]',
+    borderTop: 'border-t-[#E53935]',
+    textColor: 'text-[#EF5350]',
   },
   classified: {
-    border: 'border-[#8E24AA]',
-    bg: 'from-[#2a1538] to-[#141018]',
-    badge: 'bg-[#8E24AA]/20 text-[#BA68C8] border-[#8E24AA]/40',
-    glow: 'hover:shadow-[0_0_15px_rgba(142,36,170,0.3)]',
-    label: 'Classified',
+    bg: 'bg-gradient-to-b from-[#3d184a] via-[#280e30] to-[#120617]',
+    borderTop: 'border-t-[#8E24AA]',
+    textColor: 'text-[#CE93D8]',
   },
   restricted: {
-    border: 'border-[#1E88E5]',
-    bg: 'from-[#122538] to-[#0f1418]',
-    badge: 'bg-[#1E88E5]/20 text-[#64B5F6] border-[#1E88E5]/40',
-    glow: 'hover:shadow-[0_0_15px_rgba(30,136,229,0.3)]',
-    label: 'Restricted',
+    bg: 'bg-gradient-to-b from-[#162e45] via-[#0d1d2b] to-[#060c13]',
+    borderTop: 'border-t-[#1E88E5]',
+    textColor: 'text-[#64B5F6]',
   },
   'mil-spec': {
-    border: 'border-[#43A047]',
-    bg: 'from-[#153018] to-[#0f1810]',
-    badge: 'bg-[#43A047]/20 text-[#81C784] border-[#43A047]/40',
-    glow: 'hover:shadow-[0_0_15px_rgba(67,160,71,0.3)]',
-    label: 'Mil-Spec',
+    bg: 'bg-gradient-to-b from-[#1b3d1b] via-[#102410] to-[#061006]',
+    borderTop: 'border-t-[#43A047]',
+    textColor: 'text-[#81C784]',
   },
   industrial: {
-    border: 'border-[#616161]',
-    bg: 'from-[#22252a] to-[#141517]',
-    badge: 'bg-[#616161]/20 text-[#B0BEC5] border-[#616161]/40',
-    glow: 'hover:shadow-[0_0_10px_rgba(150,150,150,0.2)]',
-    label: 'Industrial',
+    bg: 'bg-gradient-to-b from-[#2b2e34] via-[#1c1e22] to-[#0e0f11]',
+    borderTop: 'border-t-[#78909C]',
+    textColor: 'text-[#B0BEC5]',
   },
 };
 
@@ -74,33 +62,30 @@ export const ItemCard: React.FC<ItemCardProps> = ({
   onInspect,
   onSell,
   onRemove,
+  onBuy,
+  isShopItem = false,
   showSellButton = false,
   compact = false,
 }) => {
-  const rarity = RARITY_CONFIG[skin.rarity] || RARITY_CONFIG.industrial;
+  const theme = RARITY_THEMES[skin.rarity] || RARITY_THEMES.industrial;
 
   return (
     <div
-      onClick={onSelect}
+      onClick={isShopItem ? onBuy : onSelect}
       className={`
-        relative group rounded-xl border bg-gradient-to-b ${rarity.bg}
-        ${isSelected ? `${rarity.border} ring-2 ring-primary-red/80 shadow-[0_0_18px_rgba(229,57,53,0.4)]` : `${rarity.border}/70 hover:${rarity.border}`}
-        ${rarity.glow} transition-all duration-200 cursor-pointer overflow-hidden flex flex-col justify-between
-        ${compact ? 'p-2 min-h-[120px]' : 'p-2.5 min-h-[155px]'}
+        relative group rounded-md border border-[#232731] border-t-2 ${theme.borderTop}
+        ${theme.bg} ${isSelected ? 'ring-2 ring-primary-red ring-offset-1 ring-offset-[#0D0F12]' : ''}
+        transition-all duration-150 cursor-pointer overflow-hidden flex flex-col justify-between
+        hover:brightness-110 active:scale-[0.98]
+        ${compact ? 'p-2 min-h-[135px]' : 'p-2.5 min-h-[160px]'}
       `}
     >
-      {/* Top badges bar */}
-      <div className="flex items-center justify-between w-full z-10 gap-1">
-        <span
-          className={`
-            text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border
-            ${rarity.badge}
-          `}
-        >
+      {/* Top action icons */}
+      <div className="flex items-center justify-between w-full z-10">
+        <span className="text-[9px] uppercase tracking-wider font-bold text-white/50 truncate max-w-[75%]">
           {skin.type}
         </span>
 
-        {/* Quick action icons */}
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           {onInspect && (
             <button
@@ -108,10 +93,10 @@ export const ItemCard: React.FC<ItemCardProps> = ({
                 e.stopPropagation();
                 onInspect();
               }}
-              className="p-1 rounded bg-[#1B202A]/80 hover:bg-[#262B37] text-text-secondary hover:text-white transition-colors"
+              className="p-1 rounded bg-black/60 hover:bg-black text-white/70 hover:text-white transition-colors"
               title="3D Осмотр"
             >
-              <Eye className="w-3.5 h-3.5" />
+              <Eye className="w-3 h-3" />
             </button>
           )}
 
@@ -121,10 +106,10 @@ export const ItemCard: React.FC<ItemCardProps> = ({
                 e.stopPropagation();
                 onRemove();
               }}
-              className="p-1 rounded bg-[#E53935]/20 hover:bg-[#E53935] text-[#FFCDD2] hover:text-white transition-colors"
+              className="p-1 rounded bg-red-600/80 hover:bg-red-600 text-white transition-colors"
               title="Убрать"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2 className="w-3 h-3" />
             </button>
           )}
         </div>
@@ -132,61 +117,72 @@ export const ItemCard: React.FC<ItemCardProps> = ({
 
       {/* Selected Indicator Checkmark */}
       {isSelected && (
-        <div className="absolute top-2 right-2 bg-primary-red text-white p-0.5 rounded-full z-20 shadow-md">
-          <Check className="w-3.5 h-3.5 stroke-[3]" />
+        <div className="absolute top-1.5 right-1.5 bg-primary-red text-white p-0.5 rounded z-20 shadow">
+          <Check className="w-3 h-3 stroke-[3]" />
         </div>
       )}
 
-      {/* Item Image with hover zoom */}
-      <div className="relative w-full flex items-center justify-center my-1 py-1">
+      {/* Item Image */}
+      <div className="relative w-full flex items-center justify-center my-1.5 py-1">
         <img
           src={`/images/skins/${skin.localFile}`}
           alt={skin.name}
           onError={(e) => {
-            // Fallback to Steam CDN if local fails
             (e.target as HTMLImageElement).src = skin.iconUrl;
           }}
           className={`
-            object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.6)]
-            group-hover:scale-110 transition-transform duration-300 ease-out
+            object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.8)]
+            group-hover:scale-105 transition-transform duration-200 ease-out
             ${compact ? 'max-h-16 w-auto' : 'max-h-20 w-auto'}
           `}
           loading="lazy"
         />
       </div>
 
-      {/* Bottom Info: Name & Price */}
-      <div className="w-full z-10 flex flex-col gap-0.5">
+      {/* Bottom info: Name & Price strictly styled like Photo 2 */}
+      <div className="w-full z-10 flex flex-col items-center text-center mt-1">
         <span
-          className="text-xs font-semibold text-text-primary truncate block"
+          className={`text-[11px] font-extrabold uppercase tracking-wide truncate w-full block ${theme.textColor}`}
           title={skin.name}
         >
           {skin.name}
         </span>
 
-        <div className="flex items-center justify-between mt-0.5">
-          <div className="flex items-center gap-1 font-rajdhani font-bold text-sm text-[#FFD54F]">
-            <span className="text-xs">⚙️</span>
-            <span>{skin.price.toFixed(2)}</span>
-          </div>
+        <div className="flex items-center justify-center gap-1 mt-0.5 font-rajdhani font-bold text-xs text-white">
+          <span className="text-[10px]">⚙️</span>
+          <span>{skin.price.toFixed(2)}</span>
+        </div>
 
-          {showSellButton && onSell && (
+        {/* Hover Action Badge: BUY in shop, SELL in inventory */}
+        {isShopItem && onBuy && (
+          <div className="mt-1 w-full opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onBuy();
+              }}
+              className="w-full py-0.5 rounded bg-success-green hover:bg-success-green-hover text-white text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 shadow"
+            >
+              <ShoppingCart className="w-2.5 h-2.5" />
+              <span>Купить</span>
+            </button>
+          </div>
+        )}
+
+        {!isShopItem && showSellButton && onSell && (
+          <div className="mt-1 w-full opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onSell();
               }}
-              className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[#4CAF50]/20 hover:bg-[#4CAF50] text-[#A5D6A7] hover:text-white transition-colors"
-              title="Продать за Scrap"
+              className="w-full py-0.5 rounded bg-zinc-700 hover:bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider transition-colors"
             >
               Продать
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
-
-      {/* Subtle shine overlay */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
     </div>
   );
 };
