@@ -459,9 +459,505 @@ export const SKINS_DATA: SkinDefinition[] = [
         "rarity":  "industrial",
         "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Je5GTFfCk4nReh8DEiv5deMKE8pLU1RfoDqy4Pdg/360fx360f",
         "localFile":  "blue_bandana.png"
+    },
+    {
+        "id":  "blackout_thompson",
+        "name":  "Blackout Thompson",
+        "type":  "Weapon Skin",
+        "price":  6.1,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835df4mLBfCk4nReh8DEiv5dbMKg4q7EyQ_HHMsp2Hg/360fx360f",
+        "localFile":  "blackout_thompson.png"
+    },
+    {
+        "id":  "blackout_backpack",
+        "name":  "Blackout Backpack",
+        "type":  "Weapon Skin",
+        "price":  5.19,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Vf52LGfCk4nReh8DEiv5dYPKE9rLw0RPq-duh15cE/360fx360f",
+        "localFile":  "blackout_backpack.png"
+    },
+    {
+        "id":  "blackout_helmet",
+        "name":  "Blackout Helmet",
+        "type":  "Metal Face Mask",
+        "price":  19.18,
+        "rarity":  "restricted",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835BW5GLGfCk4nReh8DEiv5dbO646pbY0Rv2_e7Ma3_o/360fx360f",
+        "localFile":  "blackout_helmet.png"
+    },
+    {
+        "id":  "blackout_burlap_shirt",
+        "name":  "Blackout Burlap Shirt",
+        "type":  "Weapon Skin",
+        "price":  3.99,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Vf5mPFfCk4nReh8DEiv5dYOqs9qLQ1R_m8Mlhs5yk/360fx360f",
+        "localFile":  "blackout_burlap_shirt.png"
+    },
+    {
+        "id":  "blackout_burlap_pants",
+        "name":  "Blackout Burlap Pants",
+        "type":  "Pants",
+        "price":  5.58,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Vf5mLMfCk4nReh8DEiv5daPak7qLA_Sfi3ptcE1tc/360fx360f",
+        "localFile":  "blackout_burlap_pants.png"
+    },
+    {
+        "id":  "blackout_roadsign_gloves",
+        "name":  "Blackout Roadsign Gloves",
+        "type":  "Weapon Skin",
+        "price":  8.48,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835dd4WLHfCk4nReh8DEiv5daPaA3qrUwQ_i5-4i4TBk/360fx360f",
+        "localFile":  "blackout_roadsign_gloves.png"
+    },
+    {
+        "id":  "blackout_bar",
+        "name":  "Blackout BAR",
+        "type":  "Assault Rifle",
+        "price":  2.5,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835df52LEfCk4nReh8DEiv5dbMK8-rrM_Sfi8cmcG12k/360fx360f",
+        "localFile":  "blackout_bar.png"
+    },
+    {
+        "id":  "blackout_chestplate",
+        "name":  "Blackout Chestplate",
+        "type":  "Metal Chest Plate",
+        "price":  8.4,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835BZ7GLAfCk4nReh8DEiv5daMaE5pbYyQ_67QU5vYJM/360fx360f",
+        "localFile":  "blackout_chestplate.png"
+    },
+    {
+        "id":  "blackout_hmlmg",
+        "name":  "Blackout HMLMG",
+        "type":  "Weapon Skin",
+        "price":  5.3,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835VY4WLFfCk4nReh8DEiv5dYOq4_qLUwSPBUgA_8-g/360fx360f",
+        "localFile":  "blackout_hmlmg.png"
+    },
+    {
+        "id":  "blackout_hoodie",
+        "name":  "Blackout Hoodie",
+        "type":  "Hoodie",
+        "price":  36.26,
+        "rarity":  "classified",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835BZ4WLGfCk4nReh8DEiv5dQOa0_rLY3QP5UgG1iqQ/360fx360f",
+        "localFile":  "blackout_hoodie.png"
+    },
+    {
+        "id":  "tempered_m39",
+        "name":  "Tempered M39",
+        "type":  "Weapon Skin",
+        "price":  3.03,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835dc4GLBfCk4nReh8DEiv5deP6o-rbQ_QPDhGfQI5A/360fx360f",
+        "localFile":  "tempered_m39.png"
+    },
+    {
+        "id":  "tempered_pants",
+        "name":  "Tempered Pants",
+        "type":  "Pants",
+        "price":  3.75,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835db42LHfCk4nReh8DEiv5dePas7rbMwQ_l_UUT18g/360fx360f",
+        "localFile":  "tempered_pants.png"
+    },
+    {
+        "id":  "tempered_helmet",
+        "name":  "Tempered Helmet",
+        "type":  "Metal Face Mask",
+        "price":  2.72,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835da42LMfCk4nReh8DEiv5dbPas_pbMzRP--WTa6SIc/360fx360f",
+        "localFile":  "tempered_helmet.png"
+    },
+    {
+        "id":  "tempered_hmlmg",
+        "name":  "Tempered HMLMG",
+        "type":  "Weapon Skin",
+        "price":  3.06,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835VZ5GLHfCk4nReh8DEiv5daOq45qLY0QP63NTqP3E4/360fx360f",
+        "localFile":  "tempered_hmlmg.png"
+    },
+    {
+        "id":  "tempered_thompson",
+        "name":  "Tempered Thompson",
+        "type":  "Weapon Skin",
+        "price":  2.86,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835df4GLEfCk4nReh8DEiv5dbOKE9pbUzSfy5Guh8qW8/360fx360f",
+        "localFile":  "tempered_thompson.png"
+    },
+    {
+        "id":  "tempered_roadsign_gloves",
+        "name":  "Tempered Roadsign Gloves",
+        "type":  "Weapon Skin",
+        "price":  2.36,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835dd7GLBfCk4nReh8DEiv5ddOqo5rLM2RPH0Mi0VXQ/360fx360f",
+        "localFile":  "tempered_roadsign_gloves.png"
+    },
+    {
+        "id":  "tempered_hoodie",
+        "name":  "Tempered Hoodie",
+        "type":  "Hoodie",
+        "price":  2.92,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835db42LGfCk4nReh8DEiv5daOq05qLQ_Qfu3G5etilE/360fx360f",
+        "localFile":  "tempered_hoodie.png"
+    },
+    {
+        "id":  "tempered_chest_plate",
+        "name":  "Tempered Chest Plate",
+        "type":  "Metal Chest Plate",
+        "price":  1.27,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835dZ7GLFfCk4nReh8DEiv5dbPK04pLM1QPuyDVyPMg/360fx360f",
+        "localFile":  "tempered_chest_plate.png"
+    },
+    {
+        "id":  "hot_tempered_revolver",
+        "name":  "Hot-tempered Revolver",
+        "type":  "Weapon Skin",
+        "price":  26.98,
+        "rarity":  "classified",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Fe5WPNfCk4nReh8DEiv5dbP6g3rLIzQPC7OPrl7_Y/360fx360f",
+        "localFile":  "hot_tempered_revolver.png"
+    },
+    {
+        "id":  "tempered_backpack",
+        "name":  "Tempered Backpack",
+        "type":  "Weapon Skin",
+        "price":  3.36,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Va5GLFfCk4nReh8DEiv5dfPqo8qLM2SfFzegIarA/360fx360f",
+        "localFile":  "tempered_backpack.png"
+    },
+    {
+        "id":  "electric_furnace_from_hell",
+        "name":  "Electric Furnace from Hell",
+        "type":  "Weapon Skin",
+        "price":  5.13,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Re4WLCfCk4nReh8DEiv5daMKA9rLY2QPy_dq7SyHQ/360fx360f",
+        "localFile":  "electric_furnace_from_hell.png"
+    },
+    {
+        "id":  "sar_from_hell",
+        "name":  "SAR from Hell",
+        "type":  "Assault Rifle",
+        "price":  1.62,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835de5GLFfCk4nReh8DEiv5daOKs6qrc3QPq6U1piV00/360fx360f",
+        "localFile":  "sar_from_hell.png"
+    },
+    {
+        "id":  "garage_door_from_hell",
+        "name":  "Garage Door from Hell",
+        "type":  "Assault Rifle",
+        "price":  3.57,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835BX4WLDfCk4nReh8DEiv5dYPKA5qrY_Q_26K1fSIao/360fx360f",
+        "localFile":  "garage_door_from_hell.png"
+    },
+    {
+        "id":  "locker_from_hell",
+        "name":  "Locker from Hell",
+        "type":  "Weapon Skin",
+        "price":  2.34,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Zc7WLFfCk4nReh8DEiv5dYPq06qbYzRPu9jFvmsGU/360fx360f",
+        "localFile":  "locker_from_hell.png"
+    },
+    {
+        "id":  "rug_from_hell",
+        "name":  "Rug from Hell",
+        "type":  "Weapon Skin",
+        "price":  4.62,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Ze4GLEfCk4nReh8DEiv5ddPas3pbcxSP77HcDeaA/360fx360f",
+        "localFile":  "rug_from_hell.png"
+    },
+    {
+        "id":  "hammer_from_hell",
+        "name":  "Hammer from Hell",
+        "type":  "Weapon Skin",
+        "price":  4.77,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835VY5WPAfCk4nReh8DEiv5ddMKk2rL0xR_5bEvpfGg/360fx360f",
+        "localFile":  "hammer_from_hell.png"
+    },
+    {
+        "id":  "hatchet_from_hell",
+        "name":  "Hatchet From Hell",
+        "type":  "Weapon Skin",
+        "price":  1.84,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Zd4mLFfCk4nReh8DEiv5dbOqA-qLE3R_i8-qdiWck/360fx360f",
+        "localFile":  "hatchet_from_hell.png"
+    },
+    {
+        "id":  "combat_knife_from_hell",
+        "name":  "Combat Knife from Hell",
+        "type":  "Weapon Skin",
+        "price":  23.04,
+        "rarity":  "classified",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Bc5mLCfCk4nReh8DEiv5ddOas8rbM0QP64LMrNXjE/360fx360f",
+        "localFile":  "combat_knife_from_hell.png"
+    },
+    {
+        "id":  "box_from_hell",
+        "name":  "Box from Hell",
+        "type":  "Weapon Skin",
+        "price":  23.06,
+        "rarity":  "classified",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835FX4mLMfCk4nReh8DEiv5dYMKw-q7MwRP-89PErvwE/360fx360f",
+        "localFile":  "box_from_hell.png"
+    },
+    {
+        "id":  "stone_pick_axe_from_hell",
+        "name":  "Stone Pick Axe from Hell",
+        "type":  "Weapon Skin",
+        "price":  5.72,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835ZX5WLAfCk4nReh8DEiv5dfOK83qLw_SfuOqy2RKA/360fx360f",
+        "localFile":  "stone_pick_axe_from_hell.png"
+    },
+    {
+        "id":  "glory_mask",
+        "name":  "Glory Mask",
+        "type":  "Metal Face Mask",
+        "price":  12.14,
+        "rarity":  "restricted",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Bf5GLGfCk4nReh8DEiv5daMaw7qLI_Sf--5DM6vCg/360fx360f",
+        "localFile":  "glory_mask.png"
+    },
+    {
+        "id":  "glory_knife",
+        "name":  "Glory Knife",
+        "type":  "Weapon Skin",
+        "price":  5.91,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Bf7WLEfCk4nReh8DEiv5daMaw8q7I3Q_y7cGeD4-s/360fx360f",
+        "localFile":  "glory_knife.png"
+    },
+    {
+        "id":  "glory_rocket_launcher",
+        "name":  "Glory Rocket Launcher",
+        "type":  "Weapon Skin",
+        "price":  2.31,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Bf4GLFfCk4nReh8DEiv5dYOKo2q7EyR_u_fFhCDR4/360fx360f",
+        "localFile":  "glory_rocket_launcher.png"
+    },
+    {
+        "id":  "glory_sar",
+        "name":  "Glory SAR",
+        "type":  "Assault Rifle",
+        "price":  28.05,
+        "rarity":  "classified",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Fd52LEfCk4nReh8DEiv5dbPa44pbAyQfgqQ4oEgQ/360fx360f",
+        "localFile":  "glory_sar.png"
+    },
+    {
+        "id":  "glory_thompson",
+        "name":  "Glory Thompson",
+        "type":  "Weapon Skin",
+        "price":  22.35,
+        "rarity":  "restricted",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Bf42LGfCk4nReh8DEiv5dbMKo6rLQ-QPy_jorrhMw/360fx360f",
+        "localFile":  "glory_thompson.png"
+    },
+    {
+        "id":  "glory_gloves",
+        "name":  "Glory Gloves",
+        "type":  "Weapon Skin",
+        "price":  12.86,
+        "rarity":  "restricted",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Bf5GLEfCk4nReh8DEiv5dfOKk7pbU-R_BM1udkQg/360fx360f",
+        "localFile":  "glory_gloves.png"
+    },
+    {
+        "id":  "glory_boots",
+        "name":  "Glory Boots",
+        "type":  "Weapon Skin",
+        "price":  2.24,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Bf52LHfCk4nReh8DEiv5dYMKA9rrMzQfi9MPyKGYs/360fx360f",
+        "localFile":  "glory_boots.png"
+    },
+    {
+        "id":  "glory_bar",
+        "name":  "Glory BAR",
+        "type":  "Assault Rifle",
+        "price":  10.8,
+        "rarity":  "restricted",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Fd5WPFfCk4nReh8DEiv5daPKw8qLQ0Rvy7MO0-KdQ/360fx360f",
+        "localFile":  "glory_bar.png"
+    },
+    {
+        "id":  "glory_rifle",
+        "name":  "Glory Rifle",
+        "type":  "Semi-Automatic Rifle",
+        "price":  5.7,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Bf7GLEfCk4nReh8DEiv5dYPaw2pbw-Sfu3dIKO0r4/360fx360f",
+        "localFile":  "glory_rifle.png"
+    },
+    {
+        "id":  "no_mercy_wood_pants",
+        "name":  "No Mercy Wood Pants",
+        "type":  "Pants",
+        "price":  5.04,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Re4mLCfCk4nReh8DEiv5dYPKE-qL02RPm8WHHjpgM/360fx360f",
+        "localFile":  "no_mercy_wood_pants.png"
+    },
+    {
+        "id":  "no_mercy_tactical_gloves",
+        "name":  "No Mercy Tactical Gloves",
+        "type":  "Weapon Skin",
+        "price":  4.34,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835VZ5mLEfCk4nReh8DEiv5dYOaE4rLY1SPq-yKGg1sA/360fx360f",
+        "localFile":  "no_mercy_tactical_gloves.png"
+    },
+    {
+        "id":  "no_mercy_backpack",
+        "name":  "No Mercy Backpack",
+        "type":  "Weapon Skin",
+        "price":  3.15,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Vf5mLEfCk4nReh8DEiv5dbP685qLQ2Sfy6bXXpBTE/360fx360f",
+        "localFile":  "no_mercy_backpack.png"
+    },
+    {
+        "id":  "no_mercy_auto_turret",
+        "name":  "No Mercy Auto Turret",
+        "type":  "Weapon Skin",
+        "price":  2.11,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835VX52LFfCk4nReh8DEiv5dbPak2pbIyQ_EiMGQo8g/360fx360f",
+        "localFile":  "no_mercy_auto_turret.png"
+    },
+    {
+        "id":  "no_mercy_hmlmg",
+        "name":  "No Mercy HMLMG",
+        "type":  "Weapon Skin",
+        "price":  1.54,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835VY5mLDfCk4nReh8DEiv5dYPa0_rbUyQfi4ru5reBQ/360fx360f",
+        "localFile":  "no_mercy_hmlmg.png"
+    },
+    {
+        "id":  "no_mercy_l96",
+        "name":  "No Mercy L96",
+        "type":  "Weapon Skin",
+        "price":  2.85,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835dc4GLFfCk4nReh8DEiv5dYOqo8q7c2RPG2_tP580k/360fx360f",
+        "localFile":  "no_mercy_l96.png"
+    },
+    {
+        "id":  "no_mercy_wood_gloves",
+        "name":  "No Mercy Wood Gloves",
+        "type":  "Weapon Skin",
+        "price":  2.6,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Re7WPFfCk4nReh8DEiv5dYPqE_qrU-Sf9hlPTw0A/360fx360f",
+        "localFile":  "no_mercy_wood_gloves.png"
+    },
+    {
+        "id":  "no_mercy_bed",
+        "name":  "No Mercy Bed",
+        "type":  "Weapon Skin",
+        "price":  2.16,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Vb7GLEfCk4nReh8DEiv5dbP6w-rLQ1Sf-__yfE-k4/360fx360f",
+        "localFile":  "no_mercy_bed.png"
+    },
+    {
+        "id":  "no_mercy_thompson",
+        "name":  "No Mercy Thompson",
+        "type":  "Weapon Skin",
+        "price":  6.06,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835dd5WLEfCk4nReh8DEiv5daOqA5rbA0Qvy6UVR3S98/360fx360f",
+        "localFile":  "no_mercy_thompson.png"
+    },
+    {
+        "id":  "retrowave_crossbow",
+        "name":  "Retrowave Crossbow",
+        "type":  "Weapon Skin",
+        "price":  2.17,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835BW7WLHfCk4nReh8DEiv5ddOKA8pLQ2Rf-_fJAk7vA/360fx360f",
+        "localFile":  "retrowave_crossbow.png"
+    },
+    {
+        "id":  "retrowave_ar",
+        "name":  "Retrowave AR",
+        "type":  "Assault Rifle",
+        "price":  3.8,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835de5WLDfCk4nReh8DEiv5dbPqs3rLI0Rfy-CueZeks/360fx360f",
+        "localFile":  "retrowave_ar.png"
+    },
+    {
+        "id":  "retrowave_sleeping_bag",
+        "name":  "Retrowave Sleeping Bag",
+        "type":  "Weapon Skin",
+        "price":  2.54,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835BX5WLAfCk4nReh8DEiv5dbOKk9pbQzR_698wDH40k/360fx360f",
+        "localFile":  "retrowave_sleeping_bag.png"
+    },
+    {
+        "id":  "retrowave_bow",
+        "name":  "Retrowave Bow",
+        "type":  "Weapon Skin",
+        "price":  3.66,
+        "rarity":  "mil-spec",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835BX4mLFfCk4nReh8DEiv5dcPKw4r70zRQuWei2W/360fx360f",
+        "localFile":  "retrowave_bow.png"
+    },
+    {
+        "id":  "retrowave_sar",
+        "name":  "Retrowave SAR",
+        "type":  "Assault Rifle",
+        "price":  2.43,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835BX7GLEfCk4nReh8DEiv5dYO647qbYzQvi52nlqJtc/360fx360f",
+        "localFile":  "retrowave_sar.png"
+    },
+    {
+        "id":  "retrowave_large_box",
+        "name":  "Retrowave Large Box",
+        "type":  "Assault Rifle",
+        "price":  1.74,
+        "rarity":  "industrial",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835df42LEfCk4nReh8DEiv5dYP6g_qLY0RP22gEnyeNo/360fx360f",
+        "localFile":  "retrowave_large_box.png"
+    },
+    {
+        "id":  "horror_bag",
+        "name":  "Horror Bag",
+        "type":  "Weapon Skin",
+        "price":  1896.38,
+        "rarity":  "contraband",
+        "iconUrl":  "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Je5WLCfCk4nReh8DEiv5deOK84rrw0Q_9tleI06A/360fx360f",
+        "localFile":  "horror_bag.png"
     }
-]
-;
+];
 
-export const SKINS_MAP: Record<string, SkinDefinition> = SKINS_DATA.reduce((acc, skin) => { acc[skin.id] = skin; return acc; }, {} as Record<string, SkinDefinition>);
-
+export const SKINS_MAP: Record<string, SkinDefinition> = SKINS_DATA.reduce((acc, skin) => {
+  acc[skin.id] = skin;
+  return acc;
+}, {} as Record<string, SkinDefinition>);

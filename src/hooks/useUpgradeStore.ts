@@ -22,7 +22,7 @@ export function useUpgradeStore() {
   const [fairState, setFairState] = useState<StoredFairState | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
-  const [wheelOutcome, setWheelOutcome] = useState<'idle' | 'win' | 'lose' | 'golden_win'>('idle');
+  const [wheelOutcome, setWheelOutcome] = useState<'idle' | 'win' | 'lose'>('idle');
   const [outcomeSkin, setOutcomeSkin] = useState<SkinDefinition | null>(null);
 
   // Initialize Fair State & History
@@ -243,35 +243,14 @@ export function useUpgradeStore() {
       soundManager.stopWheelTicks();
       setIsSpinning(false);
 
-      if (fairResult.isGoldenWin) {
-        // GOLDEN ZONE HIT! X4 MULTIPLIER JACKPOT!
-        setWheelOutcome('golden_win');
-        setOutcomeSkin(targetSkin);
-        soundManager.play('jackpot');
-        try {
-          confetti({
-            particleCount: 220,
-            spread: 100,
-            origin: { y: 0.5 },
-            colors: ['#FFD700', '#FFA500', '#FF8C00', '#FFF8DC', '#FFFFFF'],
-          });
-        } catch {
-          // Confetti fallback
-        }
-
-        // Add 4x copies of won skin to inventory
-        addSkin(targetSkin.id);
-        addSkin(targetSkin.id);
-        addSkin(targetSkin.id);
-        addSkin(targetSkin.id);
-      } else if (fairResult.isWin) {
+      if (fairResult.isWin) {
         setWheelOutcome('win');
         setOutcomeSkin(targetSkin);
         soundManager.play('win');
         try {
           confetti({
-            particleCount: 90,
-            spread: 70,
+            particleCount: 100,
+            spread: 75,
             origin: { y: 0.5 },
             colors: ['#4CAF50', '#FFD54F', '#FFFFFF'],
           });
@@ -287,10 +266,10 @@ export function useUpgradeStore() {
         soundManager.play('lose');
       }
 
-      // Automatically reset wheel outcome to 'idle' after 5 seconds
+      // Automatically reset wheel outcome to 'idle' after 4.5 seconds
       setTimeout(() => {
         setWheelOutcome('idle');
-      }, 5000);
+      }, 4500);
 
       // Deduct scrap & items
       if (scrapSlider > 0) {
@@ -317,7 +296,6 @@ export function useUpgradeStore() {
         roll: fairResult.roll,
         threshold: fairResult.threshold,
         isWin: fairResult.isWin,
-        isGoldenWin: fairResult.isGoldenWin,
         landingAngle: fairResult.landingAngle,
       };
 
