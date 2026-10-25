@@ -13,6 +13,7 @@ import { SkinInspectModal } from './components/effects/SkinInspectModal';
 import { ProfileModal } from './components/profile/ProfileModal';
 import { FairVerifierModal } from './components/provably-fair/FairVerifierModal';
 import { AirdropModal } from './components/effects/AirdropModal';
+import { AdminModal } from './components/admin/AdminModal';
 
 // Hooks & Data
 import { useUserStore } from './hooks/useUserStore';
@@ -43,6 +44,9 @@ export function App() {
     updateNickname,
     redeemPromoCode,
     resetProgress,
+    setBalance,
+    clearInventory,
+    importProfile,
   } = useUserStore();
 
   const [activeNavTab, setActiveNavTab] = useState<'upgrade' | 'furnace'>('upgrade');
@@ -59,6 +63,7 @@ export function App() {
     wheelOutcome,
     outcomeSkin,
     isSpinning,
+    spinDuration,
     turboMode,
     statusMessage,
     roundHistory,
@@ -88,6 +93,19 @@ export function App() {
   const [inspectSkin, setInspectSkin] = useState<SkinDefinition | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const [isFairModalOpen, setIsFairModalOpen] = useState<boolean>(false);
+  const [isAdminOpen, setIsAdminOpen] = useState<boolean>(false);
+
+  // F1 Shortcut for Admin Console
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'F1') {
+        e.preventDefault();
+        setIsAdminOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Particles for Mining Scrap
   const [particles, setParticles] = useState<ClickParticle[]>([]);
@@ -134,7 +152,7 @@ export function App() {
     if (mineCooldown > 0) return;
 
     soundManager.play('barrel_hit');
-    addScrap(1.0);
+    addScrap(0.5);
     try {
       localStorage.setItem('rustgrade_last_mine_time', Date.now().toString());
     } catch {
@@ -179,7 +197,7 @@ export function App() {
             className="absolute font-rajdhani font-black text-lg text-[#FFD54F] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] animate-float-up flex items-center gap-1"
             style={{ left: p.x - 25, top: p.y - 20 }}
           >
-            <span>+1.00</span>
+            <span>+0.50</span>
             <ScrapIcon size="sm" />
           </div>
         ))}
@@ -237,6 +255,7 @@ export function App() {
                       wheelOutcome={wheelOutcome}
                       outcomeSkin={outcomeSkin}
                       isSpinning={isSpinning}
+                      spinDuration={spinDuration}
                       turboMode={turboMode}
                       statusMessage={statusMessage}
                       onRemoveItem={removeSelectedItem}
@@ -282,7 +301,7 @@ export function App() {
         </div>
 
         {/* Footer */}
-        <Footer />
+        <Footer onOpenAdmin={() => setIsAdminOpen(true)} />
       </div>
 
       {/* Floating Support Chat Icon in bottom right corner strictly matching Photo 5 */}
@@ -297,6 +316,19 @@ export function App() {
       </div>
 
       {/* MODALS */}
+
+      {/* F1 Admin Dev Console Modal */}
+      <AdminModal
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
+        profile={profile}
+        onSetBalance={setBalance}
+        onAddSkin={addSkin}
+        onClearInventory={clearInventory}
+        onImportProfile={importProfile}
+        onTriggerAirdrop={spawnAirdrop}
+        onResetProgress={resetProgress}
+      />
 
       {/* 3D Skin Inspect Modal */}
       <SkinInspectModal
@@ -328,15 +360,17 @@ export function App() {
         roundHistory={roundHistory}
       />
 
-      {/* Airdrop Event Modal */}
-      <AirdropModal
-        isActive={isAirdropActive}
-        timeLeft={airdropTimeLeft}
-        lastReward={airdropReward}
-        showClaimModal={showAirdropClaimModal}
-        onClaim={handleClaimAirdrop}
-        onCloseClaimModal={() => setShowAirdropClaimModal(false)}
-      />
+      {/* Airdrop Event Modal (rendered only if triggered) */}
+      {(isAirdropActive || showAirdropClaimModal) && (
+        <AirdropModal
+          isActive={isAirdropActive}
+          timeLeft={airdropTimeLeft}
+          lastReward={airdropReward}
+          showClaimModal={showAirdropClaimModal}
+          onClaim={handleClaimAirdrop}
+          onCloseClaimModal={() => setShowAirdropClaimModal(false)}
+        />
+      )}
     </div>
   );
 }

@@ -7,6 +7,7 @@ interface UpgradeWheelProps {
   winProbability: number;
   rotation: number;
   isSpinning: boolean;
+  spinDuration?: number;
   turboMode: boolean;
   safetyStatus: {
     label: string;
@@ -22,6 +23,7 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
   winProbability,
   rotation,
   isSpinning,
+  spinDuration,
   turboMode,
   safetyStatus,
   wheelOutcome = 'idle',
@@ -222,7 +224,7 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
             className="absolute inset-0 pointer-events-none z-10"
             style={{
               transform: `rotate(${rotation - 8}deg)`,
-              transition: `transform ${turboMode ? 0.8 : 3.5}s cubic-bezier(0.14, 0.94, 0.22, 1)`,
+              transition: `transform ${spinDuration || (turboMode ? 0.8 : 3.5)}s cubic-bezier(0.14, 0.94, 0.22, 1)`,
             }}
           >
             <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-8 h-8 bg-red-600/35 blur-md rounded-full" />
@@ -235,7 +237,7 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
           style={{
             transform: `rotate(${rotation}deg)`,
             transition: isSpinning
-              ? `transform ${turboMode ? 0.8 : 3.5}s cubic-bezier(0.14, 0.94, 0.22, 1)`
+              ? `transform ${spinDuration || (turboMode ? 0.8 : 3.5)}s cubic-bezier(0.14, 0.94, 0.22, 1)`
               : 'none',
           }}
         >

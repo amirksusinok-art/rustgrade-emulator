@@ -2,6 +2,96 @@
 
 export const SKINS_DATA: SkinDefinition[] = [
     {
+        "id": "helks_golden_facemask",
+        "name": "Helk's Golden Facemask",
+        "type": "Mythic Mask",
+        "price": 20000.0,
+        "rarity": "contraband",
+        "iconUrl": "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Fe5GLEfCk4nReh8DEiv5daPq0_qrw_QfG9O-tu0Dw/360fx360f",
+        "localFile": "legendary_gold_facemask.png"
+    },
+    {
+        "id": "golden_dragon_lr300",
+        "name": "Golden Dragon LR-300",
+        "type": "LR-300 Rifle",
+        "price": 12000.0,
+        "rarity": "contraband",
+        "iconUrl": "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Fe5GPHfCk4nReh8DEiv5dbOak6qLY-QPy_bsF4fKg/360fx360f",
+        "localFile": "bombing_lr.png"
+    },
+    {
+        "id": "glory_facemask",
+        "name": "Glory Facemask",
+        "type": "Metal Face Mask",
+        "price": 8200.0,
+        "rarity": "contraband",
+        "iconUrl": "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Fc5GLGfCk4nReh8DEiv5daMag5qLU2QPi5xVewp5A/360fx360f",
+        "localFile": "glory_mask.png"
+    },
+    {
+        "id": "tempered_ak47",
+        "name": "Tempered AK47",
+        "type": "Assault Rifle",
+        "price": 6500.0,
+        "rarity": "contraband",
+        "iconUrl": "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Fe5GrGfCk4nReh8DEiv5dbMKg7qrI-R_25fqODZMQ/360fx360f",
+        "localFile": "ak_47_victoria.png"
+    },
+    {
+        "id": "alien_relic_smg",
+        "name": "Alien Relic SMG",
+        "type": "Custom SMG",
+        "price": 4800.0,
+        "rarity": "contraband",
+        "iconUrl": "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Fe5GrGfCk4nReh8DEiv5dbMKg7qrI-R_25fqODZMQ/360fx360f",
+        "localFile": "alien_red.png"
+    },
+    {
+        "id": "punishment_mask",
+        "name": "Punishment Mask",
+        "type": "Metal Face Mask",
+        "price": 3500.0,
+        "rarity": "contraband",
+        "iconUrl": "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Fe5GLEfCk4nReh8DEiv5daPq0_qrw_QfG9O-tu0Dw/360fx360f",
+        "localFile": "horror_facemask.png"
+    },
+    {
+        "id": "tempered_thompson",
+        "name": "Tempered Thompson",
+        "type": "Thompson",
+        "price": 1850.0,
+        "rarity": "contraband",
+        "iconUrl": "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Fe5GrGfCk4nReh8DEiv5dbMKg7qrI-R_25fqODZMQ/360fx360f",
+        "localFile": "tempered_thompson.png"
+    },
+    {
+        "id": "blackout_chestplate",
+        "name": "Blackout Chestplate",
+        "type": "Metal Chest Plate",
+        "price": 1350.0,
+        "rarity": "master",
+        "iconUrl": "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Fe42LEfCk4nReh8DEiv5dYP6k7rb02RfGap1rNXA/360fx360f",
+        "localFile": "blackout_chestplate.png"
+    },
+    {
+        "id": "neon_toxic_garage_door",
+        "name": "Neon Toxic Garage Door",
+        "type": "Garage Door",
+        "price": 750.0,
+        "rarity": "master",
+        "iconUrl": "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835ZZ5WLAfCk4nReh8DEiv5daOq8-q7E-Rfq6wO-unVs/360fx360f",
+        "localFile": "toxic_dragon_garage_door.png"
+    },
+    {
+        "id": "glowing_skull_large_box",
+        "name": "Glowing Skull Large Box",
+        "type": "Large Wood Box",
+        "price": 650.0,
+        "rarity": "master",
+        "iconUrl": "https://community.cloudflare.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVKyDk_zQLX05x6eLCFM9neAckxGDf7qU2e2gu64OnAeQ7835Je5WLCfCk4nReh8DEiv5deOK84rrw0Q_9tleI06A/360fx360f",
+        "localFile": "glowing_skull.png"
+    },
+    {
         "id":  "horror_bag",
         "name":  "Horror Bag",
         "type":  "Sleeping Bag",

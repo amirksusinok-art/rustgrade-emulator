@@ -266,6 +266,33 @@ export function useUserStore() {
     updateProfile(fresh);
   }, []);
 
+  // Admin Controls
+  const setBalance = useCallback((newBalance: number) => {
+    const updated: UserProfile = {
+      ...globalProfile,
+      balance: Math.max(0, Number(newBalance.toFixed(2))),
+    };
+    updateProfile(updated);
+  }, []);
+
+  const clearInventory = useCallback(() => {
+    const updated: UserProfile = {
+      ...globalProfile,
+      inventory: [],
+    };
+    updateProfile(updated);
+  }, []);
+
+  const importProfile = useCallback((imported: UserProfile) => {
+    if (!imported || typeof imported.balance !== 'number') return;
+    const sanitized: UserProfile = {
+      ...getDefaultProfile(),
+      ...imported,
+      inventory: Array.isArray(imported.inventory) ? imported.inventory : [],
+    };
+    updateProfile(sanitized);
+  }, []);
+
   return {
     profile,
     addScrap,
@@ -282,5 +309,8 @@ export function useUserStore() {
     buySkin,
     recordRoundResult,
     resetProgress,
+    setBalance,
+    clearInventory,
+    importProfile,
   };
 }

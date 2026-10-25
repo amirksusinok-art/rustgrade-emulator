@@ -141,7 +141,7 @@ export const Header: React.FC<HeaderProps> = ({
             title={
               mineCooldown > 0
                 ? `Перезарядка: подождите ${mineCooldown} сек.`
-                : 'Добыть +1.00 Scrap (раз в 15 секунд)'
+                : 'Добыть +0.50 Scrap (раз в 15 секунд)'
             }
           >
             <Plus className={`w-3.5 h-3.5 stroke-[3] ${mineCooldown > 0 ? 'text-zinc-500 opacity-60' : 'text-white'}`} />

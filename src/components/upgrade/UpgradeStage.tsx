@@ -20,6 +20,7 @@ interface UpgradeStageProps {
   };
   wheelRotation: number;
   isSpinning: boolean;
+  spinDuration?: number;
   turboMode: boolean;
   statusMessage: string | null;
   wheelOutcome?: 'idle' | 'win' | 'lose';
@@ -43,6 +44,7 @@ export const UpgradeStage: React.FC<UpgradeStageProps> = ({
   safetyStatus,
   wheelRotation,
   isSpinning,
+  spinDuration,
   turboMode,
   statusMessage,
   wheelOutcome = 'idle',
@@ -99,6 +101,7 @@ export const UpgradeStage: React.FC<UpgradeStageProps> = ({
             winProbability={winProbability}
             rotation={wheelRotation}
             isSpinning={isSpinning}
+            spinDuration={spinDuration}
             turboMode={turboMode}
             safetyStatus={safetyStatus}
             wheelOutcome={wheelOutcome}

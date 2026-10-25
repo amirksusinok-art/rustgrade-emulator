@@ -5,6 +5,7 @@ import { soundManager } from '../utils/soundManager';
 import { calculateUpgradeRoll, calculateWinChance, generateRandomSeed, sha256 } from '../utils/provablyFair';
 import { loadFairState, saveFairState, StoredFairState, saveRoundHistory, loadRoundHistory } from '../utils/storage';
 import { useUserStore } from './useUserStore';
+import { adminManager } from '../utils/adminManager';
 import confetti from 'canvas-confetti';
 
 export function useUpgradeStore() {
@@ -14,6 +15,7 @@ export function useUpgradeStore() {
   const [scrapSlider, setScrapSlider] = useState<number>(0);
   const [targetSkin, setTargetSkin] = useState<SkinDefinition | null>(() => SKINS_DATA[0] || null);
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
+  const [spinDuration, setSpinDuration] = useState<number>(3.5);
   const [turboMode, setTurboMode] = useState<boolean>(false);
   const [wheelRotation, setWheelRotation] = useState<number>(0);
   const [lastRoundResult, setLastRoundResult] = useState<UpgradeRound | null>(null);
@@ -214,16 +216,37 @@ export function useUpgradeStore() {
 
     await new Promise((r) => setTimeout(r, 280));
 
-    const duration = turboMode ? 800 : 3500;
+    const forcedOutcome = adminManager.consumeForceNextOutcome();
+    const customSpeed = adminManager.getRigging().wheelSpeed;
+    const duration = turboMode ? 800 : Math.round(customSpeed * 1000);
+    setSpinDuration(turboMode ? 0.8 : customSpeed);
     soundManager.startWheelTicks(duration);
 
     // Calculate Provably Fair outcome
-    const fairResult = await calculateUpgradeRoll(
+    let fairResult = await calculateUpgradeRoll(
       fairState.currentServerSeed,
       fairState.clientSeed,
       fairState.nonce,
       winProbability
     );
+
+    // Apply Admin Rigging if set
+    if (forcedOutcome === 'win') {
+      const sectorAngle = Math.min(359.99, Math.max(1, (winProbability / 100) * 360));
+      fairResult = {
+        ...fairResult,
+        isWin: true,
+        landingAngle: Number((sectorAngle * 0.5).toFixed(2)),
+      };
+    } else if (forcedOutcome === 'lose') {
+      const sectorAngle = Math.min(359.99, Math.max(1, (winProbability / 100) * 360));
+      const failRange = 360 - sectorAngle;
+      fairResult = {
+        ...fairResult,
+        isWin: false,
+        landingAngle: Number((sectorAngle + Math.max(5, failRange * 0.5)).toFixed(2)),
+      };
+    }
 
     // Arrow rotation calculation:
     // The wheel plate is static. The arrow starts at 0° (top) and rotates clockwise.
@@ -354,6 +377,7 @@ export function useUpgradeStore() {
     winProbability,
     safetyStatus,
     isSpinning,
+    spinDuration,
     turboMode,
     wheelRotation,
     wheelOutcome,

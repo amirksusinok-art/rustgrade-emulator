@@ -9,7 +9,7 @@ export interface AirdropReward {
   skin?: SkinDefinition;
 }
 
-export function useAirdropTimer() {
+export function useAirdropTimer(autoSpawn = false) {
   const { claimAirdrop } = useUserStore();
   const [isActive, setIsActive] = useState<boolean>(false);
   const [timeLeft, setTimeLeft] = useState<number>(10);
@@ -23,8 +23,10 @@ export function useAirdropTimer() {
     soundManager.play('airdrop_plane');
   }, []);
 
-  // First drop in 2 mins, then every 8-10 mins
+  // Periodic drop (disabled by default when autoSpawn is false)
   useEffect(() => {
+    if (!autoSpawn) return;
+
     // 2 minutes for first drop
     const firstTimeout = setTimeout(() => {
       spawnAirdrop();
@@ -39,7 +41,7 @@ export function useAirdropTimer() {
       clearTimeout(firstTimeout);
       clearInterval(interval);
     };
-  }, [spawnAirdrop]);
+  }, [autoSpawn, spawnAirdrop]);
 
   // 10-second countdown when active
   useEffect(() => {

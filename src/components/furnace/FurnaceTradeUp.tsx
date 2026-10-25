@@ -7,6 +7,7 @@ import { ItemCard } from '../inventory/ItemCard';
 import { FlatElectricFurnace } from './FlatElectricFurnace';
 import { Flame, Zap, RotateCcw, AlertTriangle, Sparkles, ChevronRight, X, TrendingUp, TrendingDown } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { adminManager } from '../../utils/adminManager';
 
 interface FurnaceTradeUpProps {
   inventory: InventoryItem[];
@@ -164,8 +165,16 @@ export const FurnaceTradeUp: React.FC<FurnaceTradeUpProps> = ({
     // 2. Start furnace heating loop
     soundManager.play('furnace_loop');
 
-    // Pick a random outcome from the next tier pool (authentic market distribution)
-    const pickedSkin = targetPool[Math.floor(Math.random() * targetPool.length)];
+    // Pick outcome: If admin rigged furnace is on, pick highest value skin (guaranteed max profit)
+    const isRigged = adminManager.getRigging().riggedFurnace;
+    let pickedSkin: SkinDefinition;
+    if (isRigged) {
+      const sortedPool = [...targetPool].sort((a, b) => b.price - a.price);
+      pickedSkin = sortedPool[0];
+    } else {
+      pickedSkin = targetPool[Math.floor(Math.random() * targetPool.length)];
+    }
+
     const profit = pickedSkin.price - currentSpent;
     const isProfit = profit >= 0;
     const multiplier = currentSpent > 0 ? Number((pickedSkin.price / currentSpent).toFixed(2)) : 1.0;
