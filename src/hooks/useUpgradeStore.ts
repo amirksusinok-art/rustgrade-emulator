@@ -103,6 +103,12 @@ export function useUpgradeStore() {
     setScrapSlider(0);
   }, [isSpinning]);
 
+  const selectSingleItem = useCallback((instanceId: string) => {
+    if (isSpinning) return;
+    setSelectedItemIds([instanceId]);
+    setScrapSlider(0);
+  }, [isSpinning]);
+
   const handleSetScrapSlider = useCallback((val: number) => {
     if (isSpinning) return;
     const clamped = Math.max(0, Math.min(val, profile.balance));
@@ -389,6 +395,7 @@ export function useUpgradeStore() {
     statusMessage,
     setShowResultModal,
     toggleSelectItem,
+    selectSingleItem,
     removeSelectedItem,
     clearSelectedItems,
     setScrapSlider: handleSetScrapSlider,

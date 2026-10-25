@@ -71,3 +71,21 @@ export interface LiveDrop {
 }
 
 export type AvatarId = 'scientist' | 'naked' | 'big_grin' | 'wolf';
+
+export interface CaseItem {
+  skinId: string;
+  weight: number; // probability weight
+}
+
+export interface CaseDefinition {
+  id: string;
+  name: string;
+  subtitle: string;
+  price: number;
+  badge: string;
+  color: string;
+  glowColor: string;
+  isFree?: boolean;
+  freeConditionText?: string;
+  items: CaseItem[];
+}

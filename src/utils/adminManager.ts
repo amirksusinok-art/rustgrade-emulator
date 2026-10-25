@@ -4,6 +4,7 @@ import { getDefaultProfile, loadUserProfile, saveUserProfile } from './storage';
 export interface AdminRiggingState {
   forceNextOutcome: 'win' | 'lose' | null;
   riggedFurnace: boolean;
+  riggedCaseJackpot: boolean;
   wheelSpeed: number; // in seconds, default 3.5
 }
 
@@ -23,6 +24,7 @@ const ACTIVE_SLOT_KEY = 'rustgrade_active_slot_id';
 let adminRigging: AdminRiggingState = {
   forceNextOutcome: null,
   riggedFurnace: false,
+  riggedCaseJackpot: false,
   wheelSpeed: 3.5,
 };
 
@@ -106,6 +108,20 @@ export const adminManager = {
   setRiggedFurnace(enabled: boolean): void {
     adminRigging.riggedFurnace = enabled;
     notifyRiggingChanged();
+  },
+
+  setRiggedCaseJackpot(enabled: boolean): void {
+    adminRigging.riggedCaseJackpot = enabled;
+    notifyRiggingChanged();
+  },
+
+  consumeRiggedCaseJackpot(): boolean {
+    const current = adminRigging.riggedCaseJackpot;
+    if (current) {
+      adminRigging.riggedCaseJackpot = false;
+      notifyRiggingChanged();
+    }
+    return current;
   },
 
   setWheelSpeed(seconds: number): void {

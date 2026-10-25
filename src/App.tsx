@@ -6,6 +6,7 @@ import { UpgradeStage } from './components/upgrade/UpgradeStage';
 import { UserInventory } from './components/inventory/UserInventory';
 import { CatalogGrid } from './components/inventory/CatalogGrid';
 import { FurnaceTradeUp } from './components/furnace/FurnaceTradeUp';
+import { CasesView } from './components/cases/CasesView';
 import { Footer } from './components/layout/Footer';
 
 // Modals
@@ -14,13 +15,14 @@ import { ProfileModal } from './components/profile/ProfileModal';
 import { FairVerifierModal } from './components/provably-fair/FairVerifierModal';
 import { AirdropModal } from './components/effects/AirdropModal';
 import { AdminModal } from './components/admin/AdminModal';
+import { CaseRouletteModal } from './components/cases/CaseRouletteModal';
 
 // Hooks & Data
 import { useUserStore } from './hooks/useUserStore';
 import { useUpgradeStore } from './hooks/useUpgradeStore';
 import { useAirdropTimer } from './hooks/useAirdropTimer';
 import { SKINS_MAP } from './data/skinsData';
-import { SkinDefinition, AvatarId } from './types';
+import { SkinDefinition, AvatarId, CaseDefinition } from './types';
 import { soundManager } from './utils/soundManager';
 import { Headphones } from 'lucide-react';
 import { ScrapIcon } from './components/common/ScrapIcon';
@@ -35,6 +37,7 @@ export function App() {
   const {
     profile,
     addScrap,
+    deductScrap,
     addSkin,
     removeInventoryItems,
     sellInventoryItem,
@@ -49,7 +52,8 @@ export function App() {
     importProfile,
   } = useUserStore();
 
-  const [activeNavTab, setActiveNavTab] = useState<'upgrade' | 'furnace'>('upgrade');
+  const [activeNavTab, setActiveNavTab] = useState<'upgrade' | 'furnace' | 'cases'>('upgrade');
+  const [selectedCaseForModal, setSelectedCaseForModal] = useState<CaseDefinition | null>(null);
 
   const {
     selectedItemIds,
@@ -69,6 +73,7 @@ export function App() {
     roundHistory,
     fairState,
     toggleSelectItem,
+    selectSingleItem,
     removeSelectedItem,
     clearSelectedItems,
     setScrapSlider,
@@ -172,6 +177,17 @@ export function App() {
     [removeInventoryItems, addSkin]
   );
 
+  // Send won skin from Case opening directly to Upgrader
+  const handleSendCaseDropToUpgrader = useCallback(
+    (skinId: string) => {
+      const instanceId = addSkin(skinId);
+      selectSingleItem(instanceId);
+      setActiveNavTab('upgrade');
+      setSelectedCaseForModal(null);
+    },
+    [addSkin, selectSingleItem]
+  );
+
   return (
     <div className="min-h-screen bg-bg-main text-text-primary flex flex-col justify-between relative selection:bg-primary-red selection:text-white">
       {/* Living Atmospheric Rust Background (sparks, hangar gradient, swinging lamp) */}
@@ -225,6 +241,13 @@ export function App() {
                   onTradeUp={handleTradeUp}
                   onBuySkin={buySkin}
                   onInspectSkin={handleInspectSkinId}
+                />
+              ) : activeNavTab === 'cases' ? (
+                /* Crates & Cases View */
+                <CasesView
+                  userBalance={profile.balance}
+                  userInventory={profile.inventory}
+                  onSelectCase={(crate) => setSelectedCaseForModal(crate)}
                 />
               ) : (
                 /* Core Upgrade View */
@@ -360,6 +383,18 @@ export function App() {
           onCloseClaimModal={() => setShowAirdropClaimModal(false)}
         />
       )}
+      {/* Case Opening Roulette Modal */}
+      <CaseRouletteModal
+        caseDef={selectedCaseForModal}
+        isOpen={selectedCaseForModal !== null}
+        onClose={() => setSelectedCaseForModal(null)}
+        userBalance={profile.balance}
+        userInventory={profile.inventory}
+        onDeductScrap={deductScrap}
+        onAddScrap={addScrap}
+        onAddSkin={addSkin}
+        onSendToUpgrader={handleSendCaseDropToUpgrader}
+      />
     </div>
   );
 }

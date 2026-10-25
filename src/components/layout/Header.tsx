@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { UserProfile, AvatarId } from '../../types';
 import { soundManager } from '../../utils/soundManager';
-import { Volume2, VolumeX, ShieldCheck, Zap, User, ChevronUp, Bell, Plus, Flame } from 'lucide-react';
+import { Volume2, VolumeX, ShieldCheck, Zap, User, ChevronUp, Bell, Plus, Flame, Package } from 'lucide-react';
 import { ScrapIcon } from '../common/ScrapIcon';
 
 interface HeaderProps {
   profile: UserProfile;
   turboMode: boolean;
   mineCooldown?: number;
-  activeTab?: 'upgrade' | 'furnace';
-  onSelectTab?: (tab: 'upgrade' | 'furnace') => void;
+  activeTab?: 'upgrade' | 'furnace' | 'cases';
+  onSelectTab?: (tab: 'upgrade' | 'furnace' | 'cases') => void;
   onToggleTurbo: () => void;
   onOpenFairModal: () => void;
   onOpenProfile: () => void;
@@ -62,7 +62,7 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </div>
 
-          {/* Navigation Tabs: UPGRADE & ПЕРЕПЛАВКА */}
+          {/* Navigation Tabs: UPGRADE & ПЕРЕПЛАВКА & КЕЙСЫ */}
           <nav className="flex items-center gap-1.5 ml-2">
             <button
               onClick={() => onSelectTab && onSelectTab('upgrade')}
@@ -86,6 +86,18 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Flame className={`w-3.5 h-3.5 ${activeTab === 'furnace' ? 'text-[#FF9800] fill-current' : 'text-amber-500'}`} />
               <span>ПЕРЕПЛАВКА</span>
+            </button>
+
+            <button
+              onClick={() => onSelectTab && onSelectTab('cases')}
+              className={`flex items-center gap-1.5 px-3 md:px-4 py-1.5 rounded-t text-xs font-black uppercase tracking-wider transition-all ${
+                activeTab === 'cases'
+                  ? 'bg-[#182538] border-t-2 border-[#2196F3] text-white shadow-sm'
+                  : 'bg-transparent text-text-muted hover:text-white'
+              }`}
+            >
+              <Package className={`w-3.5 h-3.5 ${activeTab === 'cases' ? 'text-[#2196F3]' : 'text-sky-500'}`} />
+              <span>КЕЙСЫ</span>
             </button>
           </nav>
         </div>

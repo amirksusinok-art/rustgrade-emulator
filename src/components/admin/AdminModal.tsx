@@ -628,6 +628,34 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                     </div>
                   </div>
 
+                  {/* Case Jackpot Rigging */}
+                  <div className="p-4 rounded-xl bg-[#151821] border border-[#232731]">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <Package className="w-4 h-4 text-[#2196F3]" />
+                          <h4 className="font-rajdhani font-black text-base text-white uppercase tracking-wider">
+                            Подкрутка кейсов (100% Джекпот)
+                          </h4>
+                        </div>
+                        <p className="text-xs text-zinc-400 max-w-lg">
+                          Следующий открытый кейс гарантированно выдаст самый дорогой топ-скин из своего состава (например, Big Grin в Элитном ящике).
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={() => adminManager.setRiggedCaseJackpot(!rigging.riggedCaseJackpot)}
+                        className={`px-4 py-2 rounded-xl border text-xs font-black uppercase tracking-wider transition-all ${
+                          rigging.riggedCaseJackpot
+                            ? 'bg-[#2196F3] text-white border-[#2196F3] shadow-[0_0_15px_rgba(33,150,243,0.5)]'
+                            : 'bg-[#1E222B] text-zinc-400 border-zinc-700 hover:text-white'
+                        }`}
+                      >
+                        {rigging.riggedCaseJackpot ? 'ВКЛЮЧЕНО' : 'ВЫКЛЮЧЕНО'}
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Roulette Speed Slider */}
                   <div className="p-4 rounded-xl bg-[#151821] border border-[#232731]">
                     <div className="flex items-center justify-between gap-2 mb-2">
