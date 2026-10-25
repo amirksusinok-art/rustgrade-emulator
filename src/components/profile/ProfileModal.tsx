@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { UserProfile, AvatarId } from '../../types';
 import { SKINS_MAP } from '../../data/skinsData';
-import { X, Trophy, Gift, RotateCcw, Package, Check, Award } from 'lucide-react';
+import { X, Trophy, Gift, RotateCcw, Check, Award } from 'lucide-react';
+import { ScrapIcon } from '../common/ScrapIcon';
 
 interface ProfileModalProps {
   profile: UserProfile;
@@ -10,7 +11,7 @@ interface ProfileModalProps {
   onUpdateAvatar: (avatar: AvatarId) => void;
   onUpdateNickname: (nick: string) => void;
   onRedeemPromo: (code: string) => { success: boolean; message: string };
-  onTriggerAirdrop: () => void;
+  onTriggerAirdrop?: () => void;
   onResetProgress: () => void;
 }
 
@@ -112,9 +113,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               )}
             </div>
 
-            <span className="text-xs text-text-muted font-mono mt-0.5">
-              ID: {profile.id} • Баланс: ⚙️ {profile.balance.toFixed(2)} Scrap
-            </span>
+            <div className="flex items-center gap-1.5 text-xs text-text-muted font-mono mt-0.5">
+              <span>ID: {profile.id} • Баланс:</span>
+              <ScrapIcon size="xs" />
+              <span className="font-rajdhani font-black text-white">{profile.balance.toFixed(2)}</span>
+              <span>Scrap</span>
+            </div>
 
             {/* Avatar Selector Pills */}
             <div className="flex items-center gap-1.5 mt-2.5">
@@ -214,9 +218,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               />
               <div className="flex flex-col">
                 <span className="text-xs font-bold text-white">{bestSkin.name}</span>
-                <span className="text-[11px] font-rajdhani font-bold text-[#FFD54F]">
-                  ⚙️ {bestSkin.price.toFixed(2)}
-                </span>
+                <div className="flex items-center gap-1 text-[11px] font-rajdhani font-black text-[#FFD54F]">
+                  <ScrapIcon size="xs" />
+                  <span>{bestSkin.price.toFixed(2)}</span>
+                </div>
               </div>
             </div>
           )}
@@ -260,20 +265,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           </p>
         </form>
 
-        {/* Action Buttons: Trigger Airdrop & Reset Progress */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-border-dark/60">
-          <button
-            onClick={() => {
-              onTriggerAirdrop();
-              onClose();
-            }}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold uppercase tracking-wider transition-all"
-            title="Вызвать самолет C-130 с контейнером прямо сейчас"
-          >
-            <Package className="w-3.5 h-3.5" />
-            <span>Вызвать Airdrop (Тест)</span>
-          </button>
-
+        {/* Action Buttons: Reset Progress */}
+        <div className="flex items-center justify-end pt-4 border-t border-border-dark/60">
           <button
             onClick={() => {
               if (window.confirm('Вы уверены, что хотите сбросить прогресс? Баланс вернется к 5.00 Scrap.')) {
@@ -281,7 +274,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 onClose();
               }
             }}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-primary-red border border-red-500/30 text-xs font-bold uppercase tracking-wider transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-primary-red border border-red-500/30 text-xs font-bold uppercase tracking-wider transition-all"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Сброс прогресса</span>

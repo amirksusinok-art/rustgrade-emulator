@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { LivingBackground } from './components/effects/LivingBackground';
 import { Header } from './components/layout/Header';
 import { LeftSidebar } from './components/layout/LeftSidebar';
@@ -98,10 +98,49 @@ export function App() {
     if (skin) setInspectSkin(skin);
   }, []);
 
+  // 15-second Cooldown for Mining Scrap (+1 Scrap every 15s)
+  const COOLDOWN_SECONDS = 15;
+  const [mineCooldown, setMineCooldown] = useState<number>(() => {
+    try {
+      const last = localStorage.getItem('rustgrade_last_mine_time');
+      if (last) {
+        const elapsed = Math.floor((Date.now() - parseInt(last, 10)) / 1000);
+        if (elapsed < COOLDOWN_SECONDS) {
+          return COOLDOWN_SECONDS - elapsed;
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return 0;
+  });
+
+  useEffect(() => {
+    if (mineCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setMineCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [mineCooldown]);
+
   // Mining Scrap click handler with sound and floating particle
   const handleMineScrap = useCallback((e?: React.MouseEvent) => {
+    if (mineCooldown > 0) return;
+
     soundManager.play('barrel_hit');
     addScrap(1.0);
+    try {
+      localStorage.setItem('rustgrade_last_mine_time', Date.now().toString());
+    } catch {
+      // ignore
+    }
+    setMineCooldown(COOLDOWN_SECONDS);
 
     const x = e ? e.clientX : window.innerWidth / 2;
     const y = e ? e.clientY : 80;
@@ -116,7 +155,7 @@ export function App() {
     setTimeout(() => {
       setParticles((prev) => prev.filter((p) => p.id !== newParticle.id));
     }, 1000);
-  }, [addScrap]);
+  }, [addScrap, mineCooldown]);
 
   // Trade-Up handler for Electric Furnace
   const handleTradeUp = useCallback(
@@ -153,6 +192,7 @@ export function App() {
           <Header
             profile={profile}
             turboMode={turboMode}
+            mineCooldown={mineCooldown}
             activeTab={activeNavTab}
             onSelectTab={setActiveNavTab}
             onToggleTurbo={() => setTurboMode(!turboMode)}

@@ -19,7 +19,7 @@ interface SoundConfig {
 }
 
 const SOUND_CONFIGS: Record<SoundId, SoundConfig> = {
-  barrel_hit: { file: '/audio/barrel_hit.mp3', volume: 0.75 },
+  barrel_hit: { file: '/audio/barrel_hit.mp3', volume: 0.3 },
   fuse_burn: { file: '/audio/fuse_burn.mp3', volume: 0.65 },
   wheel_tick: { file: '/audio/wheel_tick.mp3', volume: 0.4 },
   win: { file: '/audio/win.mp3', volume: 0.85 },

@@ -7,12 +7,13 @@ import { ScrapIcon } from '../common/ScrapIcon';
 interface HeaderProps {
   profile: UserProfile;
   turboMode: boolean;
+  mineCooldown?: number;
   activeTab?: 'upgrade' | 'furnace';
   onSelectTab?: (tab: 'upgrade' | 'furnace') => void;
   onToggleTurbo: () => void;
   onOpenFairModal: () => void;
   onOpenProfile: () => void;
-  onMineScrap: () => void;
+  onMineScrap: (e?: React.MouseEvent) => void;
 }
 
 const AVATAR_ICONS: Record<AvatarId, string> = {
@@ -25,6 +26,7 @@ const AVATAR_ICONS: Record<AvatarId, string> = {
 export const Header: React.FC<HeaderProps> = ({
   profile,
   turboMode,
+  mineCooldown = 0,
   activeTab = 'upgrade',
   onSelectTab,
   onToggleTurbo,
@@ -127,14 +129,23 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </div>
 
-          {/* Green ПОПОЛНИТЬ Button (Кликер Scrap) */}
+          {/* Green ПОПОЛНИТЬ Button (Кликер Scrap: +1 scrap раз в 15 секунд) */}
           <button
             onClick={onMineScrap}
-            className="flex items-center gap-1.5 px-3 md:px-4 py-1.5 rounded bg-[#4CAF50] hover:bg-[#43A047] text-white text-xs font-black uppercase tracking-wider shadow-[0_0_15px_rgba(76,175,80,0.35)] transition-all active:scale-95"
-            title="Добыть +1.00 Scrap"
+            disabled={mineCooldown > 0}
+            className={`flex items-center gap-1.5 px-3 md:px-4 py-1.5 rounded text-xs font-black uppercase tracking-wider transition-all ${
+              mineCooldown > 0
+                ? 'bg-[#1E222B] text-zinc-500 border border-[#2B313E] cursor-not-allowed shadow-none'
+                : 'bg-[#4CAF50] hover:bg-[#43A047] text-white shadow-[0_0_15px_rgba(76,175,80,0.35)] active:scale-95 cursor-pointer'
+            }`}
+            title={
+              mineCooldown > 0
+                ? `Перезарядка: подождите ${mineCooldown} сек.`
+                : 'Добыть +1.00 Scrap (раз в 15 секунд)'
+            }
           >
-            <Plus className="w-3.5 h-3.5 stroke-[3]" />
-            <span>ПОПОЛНИТЬ</span>
+            <Plus className={`w-3.5 h-3.5 stroke-[3] ${mineCooldown > 0 ? 'text-zinc-500 opacity-60' : 'text-white'}`} />
+            <span>{mineCooldown > 0 ? `ПОПОЛНИТЬ (${mineCooldown}с)` : 'ПОПОЛНИТЬ'}</span>
           </button>
 
           {/* Bell Notifications */}

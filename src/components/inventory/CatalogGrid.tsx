@@ -25,6 +25,15 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 12;
 
+  // Helper to parse price input allowing comma, dot, spaces
+  const parsePriceInput = (val: string): number => {
+    if (!val) return NaN;
+    const normalized = val.replace(',', '.').replace(/[^0-9.]/g, '').trim();
+    if (!normalized) return NaN;
+    const num = parseFloat(normalized);
+    return isNaN(num) ? NaN : num;
+  };
+
   // Filter & Sort
   const filteredSkins = useMemo(() => {
     return SKINS_DATA.filter((skin) => {
@@ -35,9 +44,9 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({
       ) {
         return false;
       }
-      const min = parseFloat(minPrice);
+      const min = parsePriceInput(minPrice);
       if (!isNaN(min) && skin.price < min) return false;
-      const max = parseFloat(maxPrice);
+      const max = parsePriceInput(maxPrice);
       if (!isNaN(max) && skin.price > max) return false;
       return true;
     }).sort((a, b) => {
@@ -82,25 +91,27 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({
           </button>
 
           <input
-            type="number"
+            type="text"
+            inputMode="decimal"
             value={minPrice}
             onChange={(e) => {
               setMinPrice(e.target.value);
               setCurrentPage(1);
             }}
             placeholder="MIN"
-            className="w-14 px-2 py-1 rounded bg-[#0D0F12] border border-[#232731] text-[11px] font-rajdhani text-white placeholder-text-muted focus:outline-none focus:border-primary-red"
+            className="w-14 sm:w-16 px-1.5 py-1 rounded bg-[#0D0F12] border border-[#232731] text-xs font-rajdhani font-black text-white text-center placeholder-text-muted focus:outline-none focus:border-primary-red"
           />
 
           <input
-            type="number"
+            type="text"
+            inputMode="decimal"
             value={maxPrice}
             onChange={(e) => {
               setMaxPrice(e.target.value);
               setCurrentPage(1);
             }}
             placeholder="MAX"
-            className="w-14 px-2 py-1 rounded bg-[#0D0F12] border border-[#232731] text-[11px] font-rajdhani text-white placeholder-text-muted focus:outline-none focus:border-primary-red"
+            className="w-14 sm:w-16 px-1.5 py-1 rounded bg-[#0D0F12] border border-[#232731] text-xs font-rajdhani font-black text-white text-center placeholder-text-muted focus:outline-none focus:border-primary-red"
           />
 
           <div className="relative">
