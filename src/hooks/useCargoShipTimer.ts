@@ -6,6 +6,7 @@ import { SkinDefinition } from '../types';
 export interface CargoReward {
   scrap: number;
   skin: SkinDefinition;
+  isJackpot?: boolean;
 }
 
 const STORAGE_CARGO_TIME = 'rustgrade_last_cargo_time';
@@ -17,20 +18,31 @@ export function useCargoShipTimer(autoSpawn = true) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [currentReward, setCurrentReward] = useState<CargoReward | null>(null);
 
-  // Generate tactical cargo crate loot
+  // Generate tactical cargo crate loot (Scrap 50-100, 5% Jackpot chance, 95% Military drops)
   const generateReward = useCallback((): CargoReward => {
-    const candidateSkins = SKINS_DATA.filter(
-      (s) => s.price >= 10 && s.price <= 150
-    );
-    const chosenSkin =
-      candidateSkins[Math.floor(Math.random() * candidateSkins.length)] ||
-      SKINS_DATA.find((s) => s.id === 'mp5a4') ||
-      SKINS_DATA[0];
+    // 50.00 - 100.00 Scrap
+    const scrapAmount = Number((50 + Math.random() * 50).toFixed(2));
 
-    const scrapAmount = Number((15 + Math.random() * 35).toFixed(2)); // 15 - 50 Scrap
+    // 5% chance for rare high-tier jackpot drop
+    const isJackpot = Math.random() < 0.05;
+
+    let chosenSkin: SkinDefinition;
+    if (isJackpot) {
+      const jackpotPool = SKINS_DATA.filter((s) => s.price >= 300 && s.price <= 2500);
+      const pool = jackpotPool.length > 0 ? jackpotPool : SKINS_DATA.filter((s) => s.price >= 200);
+      chosenSkin = pool[Math.floor(Math.random() * pool.length)] || SKINS_DATA[0];
+    } else {
+      const militaryPool = SKINS_DATA.filter((s) => s.price >= 15 && s.price <= 150);
+      chosenSkin =
+        militaryPool[Math.floor(Math.random() * militaryPool.length)] ||
+        SKINS_DATA.find((s) => s.id === 'mp5a4') ||
+        SKINS_DATA[0];
+    }
+
     return {
       scrap: scrapAmount,
       skin: chosenSkin,
+      isJackpot,
     };
   }, []);
 

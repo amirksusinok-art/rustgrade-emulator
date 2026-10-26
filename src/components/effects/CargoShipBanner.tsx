@@ -37,18 +37,18 @@ export const CargoShipBanner: React.FC<CargoShipBannerProps> = ({
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-black uppercase tracking-widest text-amber-400 font-mono flex items-center gap-1">
                 <Radio className="w-3 h-3 animate-pulse" />
-                СЕРВЕРНОЕ СОБЫТИЕ • CARGO SHIP
+                СОБЫТИЕ • CARGO SHIP
               </span>
-              <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[9px] font-mono font-bold">
+              <span className="px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-mono font-bold">
                 {timeLeft}с
               </span>
             </div>
 
-            <h4 className="font-rajdhani font-black text-sm sm:text-base text-white tracking-wide uppercase truncate">
-              Сухогруз Cobalt вошёл в сектор острова
+            <h4 className="font-rajdhani font-black text-sm sm:text-base text-white tracking-wide uppercase whitespace-nowrap">
+              СУХОГРУЗ COBALT [CARGO SHIP]
             </h4>
-            <p className="text-[11px] text-zinc-300 font-sans truncate hidden sm:block">
-              На верхней палубе зафиксирован запертый контейнер учёных (Hackable Crate)
+            <p className="text-[11px] text-zinc-300 font-sans whitespace-nowrap">
+              Запертый ящик ученых на палубе
             </p>
           </div>
         </div>
@@ -57,9 +57,9 @@ export const CargoShipBanner: React.FC<CargoShipBannerProps> = ({
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={onBoard}
-            className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-rajdhani font-black text-xs sm:text-sm uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.5)] active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap animate-pulse"
+            className="px-3 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-rajdhani font-black text-xs sm:text-sm uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.5)] active:scale-95 transition-all flex items-center gap-1 cursor-pointer whitespace-nowrap animate-pulse"
           >
-            <span>ВЫСАДИТЬСЯ НА БОРТ</span>
+            <span>НА БОРТ</span>
             <ChevronRight className="w-4 h-4 stroke-[3]" />
           </button>
 
