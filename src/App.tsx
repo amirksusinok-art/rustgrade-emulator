@@ -60,6 +60,7 @@ export function App() {
     resetProgress,
     setBalance,
     clearInventory,
+    wipeAllPlayers,
     importProfile,
   } = useUserStore();
 
@@ -127,9 +128,11 @@ export function App() {
   useEffect(() => {
     (window as any).triggerCargoShip = spawnCargoShip;
     (window as any).triggerAirdrop = spawnAirdrop;
+    (window as any).openAdminModal = () => setIsAdminOpen(true);
     return () => {
       delete (window as any).triggerCargoShip;
       delete (window as any).triggerAirdrop;
+      delete (window as any).openAdminModal;
     };
   }, [spawnCargoShip, spawnAirdrop]);
 
@@ -418,6 +421,7 @@ export function App() {
         onTriggerAirdrop={spawnAirdrop}
         onTriggerCargoShip={spawnCargoShip}
         onResetProgress={resetProgress}
+        onWipeAllPlayers={wipeAllPlayers}
       />
 
       {/* 3D Skin Inspect Modal */}

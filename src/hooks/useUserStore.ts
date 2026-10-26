@@ -3,6 +3,7 @@ import { UserProfile, SkinDefinition, UpgradeRound } from '../types';
 import { loadUserProfile, saveUserProfile, getDefaultProfile } from '../utils/storage';
 import { SKINS_MAP } from '../data/skinsData';
 import { soundManager } from '../utils/soundManager';
+import { adminManager } from '../utils/adminManager';
 
 let globalProfile: UserProfile = loadUserProfile();
 const listeners = new Set<(profile: UserProfile) => void>();
@@ -419,6 +420,71 @@ export function useUserStore() {
     updateProfile(updated);
   }, []);
 
+  // Global Server Wipe: Take away all money and skins from all players & slots
+  const wipeAllPlayers = useCallback(() => {
+    // 1. Wipe current active profile: 0 balance, 0 skins, 0 staked skins
+    const wipedProfile: UserProfile = {
+      ...globalProfile,
+      balance: 0.00,
+      inventory: [],
+      stakedItems: [],
+      lastYieldClaimAt: Date.now(),
+      stats: {
+        totalUpgrades: 0,
+        totalWins: 0,
+        totalLosses: 0,
+        totalScrapEarned: 0,
+        totalAirdropsClaimed: 0,
+        totalCasesOpened: 0,
+        bestDropChance: null,
+        bestDropSkinId: null,
+        bestDropMultiplier: null,
+      },
+    };
+    updateProfile(wipedProfile);
+
+    // 2. Wipe all admin profile slots (slot_1, slot_2, slot_3)
+    const slots: ('slot_1' | 'slot_2' | 'slot_3')[] = ['slot_1', 'slot_2', 'slot_3'];
+    slots.forEach((s) => {
+      try {
+        const slotProfile = adminManager.loadSlotProfile(s);
+        slotProfile.balance = 0.00;
+        slotProfile.inventory = [];
+        slotProfile.stakedItems = [];
+        slotProfile.stats = {
+          totalUpgrades: 0,
+          totalWins: 0,
+          totalLosses: 0,
+          totalScrapEarned: 0,
+          totalAirdropsClaimed: 0,
+          totalCasesOpened: 0,
+          bestDropChance: null,
+          bestDropSkinId: null,
+          bestDropMultiplier: null,
+        };
+        adminManager.saveSlotProfile(s, slotProfile);
+      } catch {
+        // ignore
+      }
+    });
+
+    // 3. Wipe all real players from leaderboard registry
+    try {
+      localStorage.setItem('rustgrade_real_players_v1', JSON.stringify([]));
+    } catch {
+      // ignore
+    }
+
+    // 4. Wipe history
+    try {
+      localStorage.setItem('rustgrade_history_v1', JSON.stringify([]));
+    } catch {
+      // ignore
+    }
+
+    soundManager.play('pipi');
+  }, []);
+
   const importProfile = useCallback((imported: UserProfile) => {
     if (!imported || typeof imported.balance !== 'number') return;
     const sanitized: UserProfile = {
@@ -452,6 +518,7 @@ export function useUserStore() {
     resetProgress,
     setBalance,
     clearInventory,
+    wipeAllPlayers,
     importProfile,
   };
 }

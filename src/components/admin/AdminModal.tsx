@@ -29,6 +29,8 @@ import {
   Gauge,
   Sliders,
   UserCheck,
+  Skull,
+  Biohazard,
 } from 'lucide-react';
 
 interface AdminModalProps {
@@ -42,6 +44,7 @@ interface AdminModalProps {
   onTriggerAirdrop?: () => void;
   onTriggerCargoShip?: () => void;
   onResetProgress: () => void;
+  onWipeAllPlayers?: () => void;
 }
 
 type AdminTab = 'balance' | 'rigging' | 'spawner' | 'data';
@@ -57,11 +60,13 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   onTriggerAirdrop,
   onTriggerCargoShip,
   onResetProgress,
+  onWipeAllPlayers,
 }) => {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => adminManager.isAdmin());
   const [passwordInput, setPasswordInput] = useState<string>('');
   const [authError, setAuthError] = useState<string | null>(null);
+  const [wipeSuccessMsg, setWipeSuccessMsg] = useState<string | null>(null);
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<AdminTab>('balance');
@@ -239,6 +244,29 @@ export const AdminModal: React.FC<AdminModalProps> = ({
     e.target.value = '';
   };
 
+  const handleGlobalWipeAll = () => {
+    if (
+      window.confirm(
+        'ВНИМАНИЕ! Вы собираетесь выполнить ПОЛНЫЙ ВАЙП СЕРВЕРА:\n\n' +
+        '1. Забрать все деньги у всех (баланс = 0.00 ⚙️)\n' +
+        '2. Конфисковать все скины из инвентаря и стейкинга\n' +
+        '3. Очистить все слоты игроков и таблицу лидеров острова\n\n' +
+        'Вы уверены, что хотите забрать у всех деньги и скины?'
+      )
+    ) {
+      if (onWipeAllPlayers) {
+        onWipeAllPlayers();
+      } else {
+        onSetBalance(0);
+        onClearInventory();
+      }
+      setWipeSuccessMsg('☣️ [ГЛОБАЛЬНЫЙ ВАЙП]: Все деньги (0.00 ⚙️) и скины у всех игроков конфискованы! Остров сброшен.');
+      setSlotsList(adminManager.getAllSlots());
+      soundManager.play('pipi');
+      setTimeout(() => setWipeSuccessMsg(null), 6000);
+    }
+  };
+
   const handleHardReset = () => {
     if (window.confirm('ВНИМАНИЕ! Полная очистка LocalStorage сбросит все данные, баланс, инвентарь и настройки. Продолжить?')) {
       localStorage.clear();
@@ -390,6 +418,14 @@ export const AdminModal: React.FC<AdminModalProps> = ({
               </button>
             </div>
 
+            {/* Global Wipe Notification Alert */}
+            {wipeSuccessMsg && (
+              <div className="mx-4 mt-3 p-3 rounded-lg bg-red-600/30 border border-red-500 text-white font-mono text-xs flex items-center gap-2 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+                <Biohazard className="w-5 h-5 text-red-400 shrink-0" />
+                <span className="font-bold">{wipeSuccessMsg}</span>
+              </div>
+            )}
+
             {/* Tab Views */}
             <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
               {/* TAB 1: BALANCE & SLOTS */}
@@ -473,6 +509,20 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                         className="px-2.5 py-1 rounded bg-red-500/10 hover:bg-red-500/20 text-xs font-bold text-primary-red border border-red-500/30"
                       >
                         Обнулить до 0 ⚙️
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (window.confirm('Забрать все деньги (0.00 ⚙️) и все скины у текущего игрока?')) {
+                            onSetBalance(0);
+                            onClearInventory();
+                            soundManager.play('barrel_hit');
+                          }
+                        }}
+                        className="px-2.5 py-1 rounded bg-red-950/40 hover:bg-red-900/60 text-xs font-bold text-red-400 border border-red-500/40 flex items-center gap-1 cursor-pointer"
+                        title="Забрать баланс и очистить инвентарь"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>Забрать деньги и скины (0 ⚙️)</span>
                       </button>
                     </div>
                   </div>
@@ -900,6 +950,31 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                       </div>
                     </div>
                   )}
+
+                  {/* Global Server Wipe: Confiscate all money and skins from everyone */}
+                  <div className="p-4 sm:p-5 rounded-xl bg-gradient-to-r from-red-950/60 via-red-900/40 to-red-950/60 border-2 border-red-500/80 shadow-[0_0_30px_rgba(239,68,68,0.4)]">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1.5 text-red-400">
+                          <Biohazard className="w-5 h-5 text-red-500 animate-pulse" />
+                          <h4 className="font-rajdhani font-black text-base sm:text-lg text-white uppercase tracking-wider">
+                            Вайп сервера: Забрать все деньги и скины у всех
+                          </h4>
+                        </div>
+                        <p className="text-xs text-zinc-300 leading-relaxed max-w-xl">
+                          Конфискует весь скрап (баланс = <strong className="text-red-400 font-mono">0.00 ⚙️</strong>), полностью очищает инвентари, снимает все скины со стейкинга у всех профилей и сбрасывает базу игроков в таблице лидеров. Полный чистый старт экономики на острове.
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={handleGlobalWipeAll}
+                        className="px-4 sm:px-5 py-3 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-rajdhani font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(225,29,72,0.6)] active:scale-95 whitespace-nowrap cursor-pointer flex items-center gap-2 border border-red-400/50"
+                      >
+                        <Skull className="w-4 h-4 fill-current" />
+                        <span>ЗАБРАТЬ У ВСЕХ ДЕНЬГИ И СКИHЫ</span>
+                      </button>
+                    </div>
+                  </div>
 
                   {/* Hard Reset */}
                   <div className="p-4 rounded-xl bg-red-950/20 border border-red-500/30">
