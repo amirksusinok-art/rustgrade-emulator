@@ -69,6 +69,7 @@ export function useUpgradeStore() {
   const safetyStatus = useMemo(() => {
     if (winProbability >= 75) return { label: 'ОЧЕНЬ БЕЗОПАСНО', color: 'text-success-green', bg: 'bg-green-500/10' };
     if (winProbability >= 50) return { label: 'БЕЗОПАСНО', color: 'text-warning-orange', bg: 'bg-orange-500/10' };
+    if (winProbability < 1) return { label: 'СВЕРХРИСКОВАННО (<1%)', color: 'text-primary-red', bg: 'bg-red-500/20' };
     return { label: 'РИСКОВАННО', color: 'text-primary-red', bg: 'bg-red-500/10' };
   }, [winProbability]);
 
@@ -148,7 +149,7 @@ export function useUpgradeStore() {
     mode: 'auto' | 'skin' | 'slider' = 'auto'
   ) => {
     if (isSpinning) return;
-    const clampedChance = Math.min(95.00, Math.max(1.00, chancePercent));
+    const clampedChance = Math.min(95.00, Math.max(0.000001, chancePercent));
 
     if (mode === 'slider' && targetSkin) {
       // Calculate required total input: V_needed = (V_target * P) / 95
@@ -238,14 +239,14 @@ export function useUpgradeStore() {
 
     // Apply Admin Rigging if set
     if (forcedOutcome === 'win') {
-      const sectorAngle = Math.min(359.99, Math.max(1, (winProbability / 100) * 360));
+      const sectorAngle = Math.min(359.99, Math.max(0.05, (winProbability / 100) * 360));
       fairResult = {
         ...fairResult,
         isWin: true,
         landingAngle: Number((sectorAngle * 0.5).toFixed(2)),
       };
     } else if (forcedOutcome === 'lose') {
-      const sectorAngle = Math.min(359.99, Math.max(1, (winProbability / 100) * 360));
+      const sectorAngle = Math.min(359.99, Math.max(0.05, (winProbability / 100) * 360));
       const failRange = 360 - sectorAngle;
       fairResult = {
         ...fairResult,

@@ -51,9 +51,9 @@ export async function calculateUpgradeRoll(
   const roll = parseInt(rollHex, 16);
   const max52Bits = 4503599627370496; // 2^52
 
-  // Win threshold
-  const pScaled = Math.round(winProbability * 1000000);
-  const threshold = Math.floor((pScaled * max52Bits) / 100000000);
+  // Win threshold based on exact probability ratio
+  const probRatio = Math.max(0, Math.min(0.95, winProbability / 100));
+  const threshold = Math.floor(probRatio * max52Bits);
 
   const landingRatio = roll / max52Bits;
   const landingAngle = landingRatio * 360; // 0° - 360°
@@ -72,9 +72,13 @@ export async function calculateUpgradeRoll(
 
 export function calculateWinChance(inputValue: number, targetValue: number): number {
   if (targetValue <= 0 || inputValue <= 0) return 0;
-  // Formula: P = min(95.00, max(1.00, (V_input / V_target) * 0.95 * 100))
+  // Formula: P = min(95.00, (V_input / V_target) * 0.95 * 100)
   // In Rustgrade, max win chance is 95.00% (5% house edge)
   const rawP = (inputValue / targetValue) * 0.95 * 100;
-  const clamped = Math.min(95.00, Math.max(1.00, rawP));
-  return Number(clamped.toFixed(2));
+  if (rawP >= 95.00) return 95.00;
+  if (rawP <= 0.000001) return 0.000001;
+  if (rawP >= 1) return Number(rawP.toFixed(2));
+  if (rawP >= 0.01) return Number(rawP.toFixed(2));
+  // Preserve ultra-low underdog odds (e.g. 0.14 scrap vs 150,000 mask)
+  return Number(rawP.toFixed(6));
 }

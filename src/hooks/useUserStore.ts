@@ -14,20 +14,29 @@ function updateProfile(newProfile: UserProfile) {
   listeners.forEach((listener) => listener(globalProfile));
 }
 
+export const MAX_STAKING_SLOTS = 8;
+
 export function calculateSkinYield(skinId: string): number {
   const skin = SKINS_MAP[skinId];
   if (!skin) return 0;
-  if (skin.id === 'titanium_crown_facemask') return 750.0;
-  if (skin.id === 'god_of_rust_chestplate') return 500.0;
-  if (skin.id === 'immortal_skull_mask') return 375.0;
-  if (skin.id === 'platinum_dragon_lr300') return 250.0;
-  if (skin.id === 'dark_matter_ak47') return 175.0;
-  if (skin.id === 'helks_golden_facemask') return 100.0;
-  if (skin.id === 'golden_dragon_lr300') return 60.0;
-  if (skin.id === 'glory_facemask') return 40.0;
-  if (skin.id === 'tempered_ak47') return 30.0;
-  if (skin.id === 'big_grin') return 25.0;
-  if (skin.price >= 50) return Math.max(0.25, Number((skin.price * 0.005).toFixed(2)));
+  // High-tier Mythics & Legendaries give Massive Clan Yield (Oligarch status):
+  if (skin.id === 'titanium_crown_facemask') return 3500.0;
+  if (skin.id === 'god_of_rust_chestplate') return 2200.0;
+  if (skin.id === 'immortal_skull_mask') return 1500.0;
+  if (skin.id === 'platinum_dragon_lr300') return 1000.0;
+  if (skin.id === 'dark_matter_ak47') return 700.0;
+  if (skin.id === 'helks_golden_facemask') return 400.0;
+  if (skin.id === 'golden_dragon_lr300') return 200.0;
+
+  // Calibrated Mid-Tier (Holding 1 mythic beats filling all 8 slots with mid-tiers):
+  if (skin.id === 'big_grin') return 12.0;
+  if (skin.id === 'glory_facemask') return 8.0;
+  if (skin.id === 'tempered_ak47') return 5.0;
+
+  if (skin.price >= 10000) return Number((skin.price * 0.02).toFixed(2));
+  if (skin.price >= 1000) return Number((skin.price * 0.008).toFixed(2));
+  if (skin.price >= 500) return Number((skin.price * 0.005).toFixed(2));
+  if (skin.price >= 50) return Math.max(0.25, Number((skin.price * 0.003).toFixed(2)));
   return 0;
 }
 
@@ -281,6 +290,12 @@ export function useUserStore() {
 
   // Staking & Skin Lending
   const stakeSkin = useCallback((instanceId: string): boolean => {
+    const currentStaked = globalProfile.stakedItems || [];
+    if (currentStaked.length >= MAX_STAKING_SLOTS) {
+      soundManager.play('codelock_error');
+      return false;
+    }
+
     const item = globalProfile.inventory.find((i) => i.instanceId === instanceId);
     if (!item) return false;
 
@@ -289,7 +304,6 @@ export function useUserStore() {
 
     // First auto-claim pending yield before adding new skin to prevent timestamp skew
     const now = Date.now();
-    const currentStaked = globalProfile.stakedItems || [];
     const hourlyRate = currentStaked.reduce((s, i) => s + (i.yieldPerHour || 0), 0);
     const elapsedHours = Math.max(0, (now - (globalProfile.lastYieldClaimAt || now)) / 3600000);
     const pendingEarned = Number((hourlyRate * elapsedHours).toFixed(2));

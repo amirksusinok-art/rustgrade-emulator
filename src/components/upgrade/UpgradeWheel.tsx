@@ -38,8 +38,8 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
   const outerRadius = 146;
   const innerRadius = 96;
 
-  // Win Sector arc angle in degrees (1° to 359.99°)
-  const angle = Math.min(359.99, Math.max(1, (winProbability / 100) * 360));
+  // Win Sector arc angle in degrees (0.05° to 359.99°)
+  const angle = Math.min(359.99, Math.max(0.05, (winProbability / 100) * 360));
 
   // Determine sector color strictly matching Photo 5
   const sectorColor =
@@ -370,8 +370,18 @@ export const UpgradeWheel: React.FC<UpgradeWheelProps> = ({
                   title="Кликните, чтобы задать свой шанс"
                 >
                   <div className="flex items-baseline gap-1">
-                    <span className="font-rajdhani font-black text-4xl text-white tracking-tight drop-shadow-md">
-                      {winProbability.toFixed(2)}
+                    <span
+                      className={`font-rajdhani font-black text-white tracking-tight drop-shadow-md ${
+                        winProbability < 0.01 ? 'text-xl sm:text-2xl' : 'text-4xl'
+                      }`}
+                    >
+                      {winProbability >= 1
+                        ? winProbability.toFixed(2)
+                        : winProbability >= 0.01
+                        ? winProbability.toFixed(2)
+                        : winProbability >= 0.0001
+                        ? winProbability.toFixed(4)
+                        : winProbability.toFixed(6)}
                     </span>
                     <span className="text-2xl font-rajdhani font-black text-text-secondary">
                       %

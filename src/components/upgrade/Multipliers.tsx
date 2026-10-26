@@ -100,16 +100,22 @@ export const Multipliers: React.FC<MultipliersProps> = ({
             ПОЛЗУНОК ШАНСА:
           </span>
           <span className="font-rajdhani font-black text-sm text-[#FFD54F]">
-            {sliderChance.toFixed(2)}%
+            {sliderChance >= 1
+              ? sliderChance.toFixed(2)
+              : sliderChance >= 0.01
+              ? sliderChance.toFixed(2)
+              : sliderChance >= 0.0001
+              ? sliderChance.toFixed(4)
+              : sliderChance.toFixed(6)}%
           </span>
         </div>
 
         <div className="relative flex items-center">
           <input
             type="range"
-            min="1.00"
+            min="0.01"
             max="95.00"
-            step="0.5"
+            step="0.01"
             disabled={disabled}
             value={sliderChance}
             onChange={handleSliderChange}
@@ -118,7 +124,7 @@ export const Multipliers: React.FC<MultipliersProps> = ({
         </div>
 
         <div className="flex items-center justify-between text-[9px] font-rajdhani font-bold text-text-muted px-0.5">
-          <span>1.00%</span>
+          <span>0.01%</span>
           <span>50.00%</span>
           <span>95.00%</span>
         </div>

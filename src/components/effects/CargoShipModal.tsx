@@ -14,6 +14,8 @@ import {
   X,
   Volume2,
   Crown,
+  Zap,
+  Key,
 } from 'lucide-react';
 
 interface CargoShipModalProps {
@@ -49,6 +51,10 @@ export const CargoShipModal: React.FC<CargoShipModalProps> = ({
   const [phase, setPhase] = useState<ModalPhase>('locked');
   const [hackSeconds, setHackSeconds] = useState<number>(15);
   const [logIndex, setLogIndex] = useState<number>(0);
+  const [targetCode, setTargetCode] = useState<string[]>(['7', '3', '9', '1']);
+  const [userPin, setUserPin] = useState<string[]>([]);
+  const [isSuccessFlash, setIsSuccessFlash] = useState<boolean>(false);
+  const [isErrorFlash, setIsErrorFlash] = useState<boolean>(false);
   const audioStartedRef = useRef<boolean>(false);
 
   // Reset state when modal opens
@@ -57,6 +63,12 @@ export const CargoShipModal: React.FC<CargoShipModalProps> = ({
       setPhase('locked');
       setHackSeconds(15);
       setLogIndex(0);
+      setUserPin([]);
+      setIsSuccessFlash(false);
+      setIsErrorFlash(false);
+      // Generate 4-digit code using digits 1-9
+      const newCode = Array.from({ length: 4 }, () => String(Math.floor(Math.random() * 9) + 1));
+      setTargetCode(newCode);
       audioStartedRef.current = false;
     } else {
       soundManager.stop('crack_system');
@@ -98,6 +110,9 @@ export const CargoShipModal: React.FC<CargoShipModalProps> = ({
   const handleStartHack = () => {
     setPhase('hacking');
     setHackSeconds(15);
+    setUserPin([]);
+    setIsSuccessFlash(false);
+    setIsErrorFlash(false);
   };
 
   const handleFinishHacking = () => {
@@ -106,6 +121,58 @@ export const CargoShipModal: React.FC<CargoShipModalProps> = ({
     soundManager.play('cargo_open');
     setPhase('opened');
   };
+
+  // Handle keypad digit input for bypass puzzle
+  const handleKeypadPress = (digit: string) => {
+    if (phase !== 'hacking' || isSuccessFlash) return;
+    if (userPin.length >= 4) return;
+
+    soundManager.play('item_select');
+    const nextPin = [...userPin, digit];
+    setUserPin(nextPin);
+
+    // If 4 digits entered, verify code
+    if (nextPin.length === 4) {
+      if (nextPin.join('') === targetCode.join('')) {
+        // MATCH: Instant crack bypass!
+        setIsSuccessFlash(true);
+        soundManager.play('win');
+        setTimeout(() => {
+          handleFinishHacking();
+        }, 500);
+      } else {
+        // MISMATCH: Show error feedback and reset
+        setIsErrorFlash(true);
+        soundManager.play('codelock_error');
+        setTimeout(() => {
+          setUserPin([]);
+          setIsErrorFlash(false);
+        }, 600);
+      }
+    }
+  };
+
+  const handleKeypadClear = () => {
+    if (phase !== 'hacking' || isSuccessFlash) return;
+    soundManager.play('codelock_error');
+    setUserPin([]);
+  };
+
+  // Keyboard shortcut listener for digits 1-9 & Backspace
+  useEffect(() => {
+    if (phase !== 'hacking') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key >= '1' && e.key <= '9') {
+        handleKeypadPress(e.key);
+      } else if (e.key === 'Backspace' || e.key === 'Delete' || e.key.toLowerCase() === 'c') {
+        handleKeypadClear();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [phase, userPin, targetCode, isSuccessFlash]);
 
   if (!isOpen || !reward) return null;
 
@@ -249,17 +316,86 @@ export const CargoShipModal: React.FC<CargoShipModalProps> = ({
                         />
                       </div>
 
+                      {/* Mini-Game: Cobalt Bypass Cipher Keypad */}
+                      <div
+                        className={`rounded-lg p-2 border transition-all duration-300 ${
+                          isSuccessFlash
+                            ? 'bg-emerald-950/70 border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.5)]'
+                            : isErrorFlash
+                            ? 'bg-red-950/70 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)] animate-pulse'
+                            : 'bg-[#060A10] border-cyan-500/30'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between text-[10px] font-mono pb-1">
+                          <span className="text-cyan-400 font-bold flex items-center gap-1">
+                            <Key className="w-3 h-3 text-cyan-400" />
+                            ГОЛОВОЛОМКА: ВВЕДИ КОД ОБХОДА
+                          </span>
+                          <span className="text-[9px] text-emerald-400 font-bold font-mono flex items-center gap-0.5">
+                            <Zap className="w-2.5 h-2.5 text-amber-400" />
+                            МГНОВЕННЫЙ ВЗЛОМ
+                          </span>
+                        </div>
+
+                        {/* Display Required Code & User Input */}
+                        <div className="flex items-center justify-between bg-[#04060A] px-2 py-1 rounded border border-zinc-800">
+                          <div className="flex items-center gap-1.5 text-xs font-mono">
+                            <span className="text-zinc-500 text-[10px]">КОД:</span>
+                            <span className="px-1.5 py-0.5 rounded bg-cyan-950/80 border border-cyan-500/50 text-cyan-300 font-black tracking-widest text-xs shadow-[0_0_10px_rgba(6,182,212,0.3)]">
+                              {targetCode.join(' ')}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-zinc-500 text-[10px] font-mono">ВВОД:</span>
+                            <div className="flex gap-1">
+                              {[0, 1, 2, 3].map((idx) => (
+                                <span
+                                  key={idx}
+                                  className={`w-5 h-6 rounded flex items-center justify-center font-mono font-black text-xs transition-colors ${
+                                    isSuccessFlash
+                                      ? 'bg-emerald-500/40 border border-emerald-300 text-white'
+                                      : isErrorFlash
+                                      ? 'bg-red-500/40 border border-red-300 text-white'
+                                      : userPin[idx]
+                                      ? 'bg-emerald-500/20 border border-emerald-400 text-emerald-300'
+                                      : 'bg-zinc-900 border border-zinc-700 text-zinc-600'
+                                  }`}
+                                >
+                                  {userPin[idx] || '_'}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Interactive Digital Keypad 1-9 & Clear */}
+                        <div className="grid grid-cols-5 gap-1 pt-1.5">
+                          {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
+                            <button
+                              key={digit}
+                              type="button"
+                              onClick={() => handleKeypadPress(digit)}
+                              className="py-1 rounded bg-[#121924] hover:bg-[#1E2B3E] active:bg-cyan-600 active:text-white text-zinc-200 font-mono font-bold text-xs border border-[#233144] hover:border-cyan-500/50 transition-all cursor-pointer select-none shadow-xs"
+                            >
+                              {digit}
+                            </button>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={handleKeypadClear}
+                            className="py-1 rounded bg-red-950/40 hover:bg-red-900/60 active:bg-red-800 text-red-300 font-mono font-bold text-[10px] border border-red-500/30 transition-all cursor-pointer select-none"
+                          >
+                            СБРОС
+                          </button>
+                        </div>
+                      </div>
+
                       {/* Real-time terminal log scrolling */}
-                      <div className="bg-[#05070A] rounded p-2 text-[10px] space-y-0.5 h-14 overflow-hidden flex flex-col justify-end border border-zinc-900">
-                        <div className="text-zinc-600 truncate text-[9px]">
-                          {TERMINAL_LOGS[(logIndex + 1) % TERMINAL_LOGS.length]}
-                        </div>
-                        <div className="text-emerald-500/70 truncate text-[9px]">
-                          {TERMINAL_LOGS[(logIndex + 2) % TERMINAL_LOGS.length]}
-                        </div>
-                        <div className="text-emerald-300 font-bold flex items-center gap-1 truncate">
+                      <div className="bg-[#05070A] rounded p-1.5 text-[9px] h-7 overflow-hidden flex flex-col justify-end border border-zinc-900">
+                        <div className="text-emerald-300 font-bold flex items-center gap-1 truncate font-mono">
                           <span className="animate-pulse text-amber-400">❯</span>
-                          <span>{TERMINAL_LOGS[logIndex]}</span>
+                          <span>{isSuccessFlash ? 'OVERRIDE CODE ACCEPTED! CRACKING CRATE...' : TERMINAL_LOGS[logIndex]}</span>
                         </div>
                       </div>
                     </div>
@@ -316,7 +452,7 @@ export const CargoShipModal: React.FC<CargoShipModalProps> = ({
                     Запертый ящик учёных Кобальта
                   </h3>
                   <p className="text-xs text-zinc-300 font-sans leading-relaxed">
-                    Взлом ноутбука продлится <strong className="text-amber-400 font-mono">15 секунд</strong>. Внутри гарантирован металлолом <strong className="text-emerald-400 font-mono">50–100 ⚙️</strong> и армейский ствол с шансом 5% на редкий джекпот!
+                    Взлом ноутбука продлится <strong className="text-amber-400 font-mono">15 секунд</strong> (или решите шифр обхода на экране ноутбука для <strong className="text-cyan-400 font-mono">мгновенного вскрытия</strong>!). Внутри гарантирован металлолом <strong className="text-emerald-400 font-mono">50–100 ⚙️</strong> и армейский ствол с шансом 5% на редкий джекпот!
                   </p>
                 </div>
 

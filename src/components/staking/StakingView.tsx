@@ -3,7 +3,9 @@ import { UserProfile, InventoryItem, StakedSkinItem } from '../../types';
 import { SKINS_MAP } from '../../data/skinsData';
 import { calculateSkinYield } from '../../hooks/useUserStore';
 import { ScrapIcon } from '../common/ScrapIcon';
-import { Building2, Coins, ArrowUpRight, ArrowDownLeft, ShieldCheck, Sparkles, AlertCircle, Clock, Zap } from 'lucide-react';
+import { Building2, Coins, ArrowUpRight, ArrowDownLeft, ShieldCheck, Sparkles, AlertCircle, Clock, Zap, Layers } from 'lucide-react';
+
+const MAX_STAKING_SLOTS = 8;
 
 interface StakingViewProps {
   profile: UserProfile;
@@ -53,6 +55,8 @@ export const StakingView: React.FC<StakingViewProps> = ({
     const skin = SKINS_MAP[item.skinId];
     return skin && skin.price >= 50;
   });
+
+  const isStakingFull = stakedItems.length >= MAX_STAKING_SLOTS;
 
   const totalStakedValue = stakedItems.reduce((sum, item) => {
     const skin = SKINS_MAP[item.skinId];
@@ -132,23 +136,36 @@ export const StakingView: React.FC<StakingViewProps> = ({
           </div>
         </div>
 
-        {/* Highlight Quick Rates Banner */}
-        <div className="relative z-10 mt-5 pt-4 border-t border-[#252E40] grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-          <div className="flex items-center gap-2 bg-[#10141D] p-2 rounded-lg border border-[#202738]">
-            <span className="text-amber-400 font-bold">Helk's Mask:</span>
-            <span className="text-white font-mono font-bold">+100 ⚙️/ч</span>
+        {/* Highlight Quick Rates Banner & Limit Notice */}
+        <div className="relative z-10 mt-5 pt-4 border-t border-[#252E40] flex flex-col gap-3 text-xs">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5 text-[#FFD54F]" />
+              Базовые тарифы контрактов кланов острова:
+            </span>
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-[#10141D] border border-amber-500/40 text-amber-300 font-mono text-[11px] font-bold">
+              <Layers className="w-3.5 h-3.5 text-amber-400" />
+              <span>ЛИМИТ КЛАНОВЫХ КОНТРАКТОВ: 8 СЛОТОВ</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 bg-[#10141D] p-2 rounded-lg border border-[#202738]">
-            <span className="text-purple-400 font-bold">Big Grin:</span>
-            <span className="text-white font-mono font-bold">+25 ⚙️/ч</span>
-          </div>
-          <div className="flex items-center gap-2 bg-[#10141D] p-2 rounded-lg border border-[#202738]">
-            <span className="text-cyan-400 font-bold">Dark Matter AK:</span>
-            <span className="text-white font-mono font-bold">+175 ⚙️/ч</span>
-          </div>
-          <div className="flex items-center gap-2 bg-[#10141D] p-2 rounded-lg border border-[#202738]">
-            <span className="text-emerald-400 font-bold">Titanium Crown:</span>
-            <span className="text-white font-mono font-bold">+750 ⚙️/ч</span>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="flex items-center justify-between bg-[#10141D] p-2.5 rounded-lg border border-[#202738]">
+              <span className="text-amber-400 font-bold">Helk's Mask:</span>
+              <span className="text-white font-mono font-bold">+400 ⚙️/ч</span>
+            </div>
+            <div className="flex items-center justify-between bg-[#10141D] p-2.5 rounded-lg border border-[#202738]">
+              <span className="text-purple-400 font-bold">Big Grin:</span>
+              <span className="text-white font-mono font-bold">+12 ⚙️/ч</span>
+            </div>
+            <div className="flex items-center justify-between bg-[#10141D] p-2.5 rounded-lg border border-[#202738]">
+              <span className="text-cyan-400 font-bold">Dark Matter AK:</span>
+              <span className="text-white font-mono font-bold">+700 ⚙️/ч</span>
+            </div>
+            <div className="flex items-center justify-between bg-[#10141D] p-2.5 rounded-lg border border-[#202738]">
+              <span className="text-emerald-400 font-bold">Titanium Crown:</span>
+              <span className="text-[#81C784] font-mono font-black">+3,500 ⚙️/ч</span>
+            </div>
           </div>
         </div>
       </div>
@@ -162,11 +179,18 @@ export const StakingView: React.FC<StakingViewProps> = ({
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-[#4CAF50]" />
                 <h3 className="font-rajdhani font-black text-lg text-white uppercase tracking-wider">
-                  Скины в аренде ({stakedItems.length})
+                  Скины в аренде ({stakedItems.length} / {MAX_STAKING_SLOTS})
                 </h3>
               </div>
-              <div className="text-xs text-zinc-400 font-mono">
-                Ценность: <strong className="text-white">{totalStakedValue.toFixed(2)} ⚙️</strong>
+              <div className="flex items-center gap-2">
+                {stakedItems.length >= MAX_STAKING_SLOTS && (
+                  <span className="px-2 py-0.5 rounded bg-red-500/20 border border-red-500/40 text-red-400 text-[10px] font-black uppercase tracking-wider">
+                    МАКСИМУМ
+                  </span>
+                )}
+                <div className="text-xs text-zinc-400 font-mono">
+                  Ценность: <strong className="text-white">{totalStakedValue.toFixed(2)} ⚙️</strong>
+                </div>
               </div>
             </div>
 
@@ -245,6 +269,20 @@ export const StakingView: React.FC<StakingViewProps> = ({
               </span>
             </div>
 
+            {isStakingFull && (
+              <div className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-2.5 text-xs text-amber-200">
+                <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <div className="space-y-0.5">
+                  <div className="font-bold uppercase tracking-wider text-amber-300">
+                    Лимит контрактов исчерпан ({MAX_STAKING_SLOTS} / {MAX_STAKING_SLOTS})
+                  </div>
+                  <div className="text-[11px] text-zinc-300">
+                    Все 8 слотов заняты. Чтобы сдать новый скин, сначала верните один из сданных скинов в рюкзак.
+                  </div>
+                </div>
+              </div>
+            )}
+
             {eligibleInventory.length === 0 ? (
               <div className="py-14 flex flex-col items-center justify-center text-center text-zinc-400 space-y-3">
                 <div className="w-16 h-16 rounded-2xl bg-[#1A1F2B] border border-zinc-700 flex items-center justify-center text-3xl">
@@ -309,10 +347,15 @@ export const StakingView: React.FC<StakingViewProps> = ({
 
                       <button
                         onClick={() => onStakeSkin(item.instanceId)}
-                        className="w-full py-1.5 px-3 rounded-lg bg-[#2E4A28] hover:bg-[#385E30] text-white border border-[#4CAF50]/60 text-xs font-rajdhani font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+                        disabled={isStakingFull}
+                        className={`w-full py-1.5 px-3 rounded-lg text-xs font-rajdhani font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shadow-sm ${
+                          isStakingFull
+                            ? 'bg-zinc-800 text-zinc-500 border border-zinc-700 cursor-not-allowed opacity-60'
+                            : 'bg-[#2E4A28] hover:bg-[#385E30] text-white border border-[#4CAF50]/60 cursor-pointer'
+                        }`}
                       >
-                        <ArrowUpRight className="w-3.5 h-3.5 text-[#81C784]" />
-                        <span>СДАТЬ В АРЕНДУ</span>
+                        <ArrowUpRight className={`w-3.5 h-3.5 ${isStakingFull ? 'text-zinc-500' : 'text-[#81C784]'}`} />
+                        <span>{isStakingFull ? 'ЛИМИТ 8/8 ИСЧЕРПАН' : 'СДАТЬ В АРЕНДУ'}</span>
                       </button>
                     </div>
                   );
